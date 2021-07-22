@@ -1,72 +1,214 @@
-import {ErrorMessage} from "../error-message";
 import {HttpService} from "../http-service";
-import {HttpConfig, HttpServiceConfig} from "../models/http";
+import {HttpServiceConfig} from "../models/http";
 import {ErrorsDictionary} from "../models/errors";
-/*function initHttpService() {
-    return new HttpService(
-        {
-            apiUrl: 'https://localhost:3030',
-            connectionErrorHandler: 'test',
-            defaultErrorCallback: catchError,
-            defaultSuccessCallback: (data) => data,
-        });
-}
-function catchError (errorData) {
-    let errorMessage = errorData.defaultError;
-    for (const [codes, message] of errorData.errors) {
-        for (const singleCode of codes) {
-            if (errorData.data.error === singleCode) {
-                errorMessage = message;
-                break;
-            }
-        }
-    }
-    new ErrorMessage(errorMessage)
-}*/
 
-describe('httpServices', () => {
-
-    const noConfigSpy = jest.spyOn(global.console, 'warn')
-    const proto = Object.getPrototypeOf(new HttpService()).constructor
-    const priv = {
-        handleRequest: proto.handleRequest,
-        hasNoError: proto.hasNoError,
-    }
-    let connectionError;
-    const config: HttpServiceConfig = {
-        connectionErrorCallback(error: string): void { connectionError = 'erorr' },
-        defaultErrorCallback(error: string, defaultError: string, errors: ErrorsDictionary): unknown {
-            return undefined;
-        },
-        defaultRequestConfig: {},
-        defaultSuccessCallback<T>(data: unknown): T {
-            return data as T
-        },
-        apiUrl:'localhost'
-    }
+/*
+It's dummy implementation, what is ok now,
+but if we write more tests, we should move it to common file
+*/
+const setFetchData = (data: Object, error:null | string = null, warn: null | string =null) => {
     // @ts-ignore
     global.fetch = jest.fn(() =>
         Promise.resolve({
-            json: () => Promise.resolve({ rates: { CAD: 1.42 } }),
-        })
-    );
-    beforeEach(() => {
-        const x = new HttpService(config);
-        connectionError = '';
-    })
+            json: () => Promise.resolve({...data, error, warn }),
+        }))
+}
+const setRejectedFetch = (serverError: string) => {
+    // @ts-ignore
+    setFetchData('test');
 
-    describe('', () => {
-        it('console warn has been called because not configutation', () => {
+    // @ts-ignore
+    fetch.mockImplementationOnce(() => Promise.reject(serverError));
+}
+
+describe('httpServices', () => {
+    describe('without config', () => {
+        const noConfigSpy = jest.spyOn(global.console, 'warn')
+        new HttpService()
+        it('should console.warn', () => {
             expect(noConfigSpy).toBeCalled();
         })
-        it('should work', () => {
-            const result = priv.hasNoError({error: null})
-            expect(result).toBe(true);
+    })
+
+    describe('with proper config', () => {
+        // Set it to check side effects, it is cleared before each test
+        let assertions = {
+            error: '',
+            connectionError: '',
+            warn: '',
+            dataToErrorCallback: {
+                error: '',
+                errors: [] as ErrorsDictionary,
+                defaultError: ''
+            },
+            dataToWarnCallback: {
+                warn: '',
+                warns: [] as ErrorsDictionary,
+                defaultWarn: ''
+            }
+        }
+        const helpers = {
+            connectionError: 'connectionError',
+            defaultError: 'defaultErrorCallback',
+            defaultWarn: 'defaultWarn',
+            customError: 'customErrorCallback',
+            customWarn: 'customWarn',
+            errorFromServer: 'errorFromSever',
+            apiUrl: 'apiUrl',
+            urlSegment: '/users',
+            testData: {name: 'TestName', surname: 'TestSurname'},
+            defaultHeaders: {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        }
+
+        const httpConfig: HttpServiceConfig = {
+            apiUrl: helpers.apiUrl,
+            defaultRequestConfig: { ...helpers.defaultHeaders },
+            connectionErrorCallback: (error: string, defaultError, errors ) =>{
+                assertions.connectionError = error
+                assertions.dataToErrorCallback = {error, defaultError, errors, }
+            } ,
+            defaultErrorCallback: (error, defaultError, errors): void => {
+                assertions.error = helpers.defaultError
+                assertions.dataToErrorCallback = {error, defaultError, errors, }
+            },
+            defaultSuccessCallback<T>(data: unknown): T {
+                return data as T
+            },
+            defaultWarnCallback: (warn, defaultWarn , warns) => {
+                assertions.warn = helpers.defaultWarn
+                assertions.dataToWarnCallback = {warn, defaultWarn, warns}
+            },
+            defaultError: helpers.defaultError,
+            defaultWarn: helpers.defaultWarn,
+            defaultWarns: [[helpers.defaultWarn]],
+            defaultErrors: [[helpers.defaultError]],
+        }
+
+        // Get private methods and set Http Config
+        const proto = Object.getPrototypeOf(new HttpService(httpConfig))
+        // Not used yet, to consider if we should test private methods
+        // or exclude inner class from httpService and test it as public methods
+        const {
+            handleRequest,
+            handleResponse,
+            hasNoError,
+            hasWarn,
+            prepareResponseData,
+            prepareRequestData,
+            dataToPathVariables,
+        } = proto.constructor
+
+        beforeEach(() => {
+            assertions = {
+                error: '',
+                connectionError: '',
+                warn: '',
+                dataToErrorCallback: {
+                    error: '',
+                    errors: [] as ErrorsDictionary,
+                    defaultError: ''
+                },
+                dataToWarnCallback: {
+                    warn: '',
+                    warns: [] as ErrorsDictionary,
+                    defaultWarn: ''
+                }
+            }
+        });
+
+        describe('positive response', () => {
+
+            it('positive pass get without modify', () => {
+                setFetchData({...helpers.testData})
+                expect.assertions(1);
+
+                return HttpService.get({
+                    url: helpers.urlSegment,
+                }).then(data => expect(data).toEqual(helpers.testData))
+            })
+
+            it('custom success callback modify response data', () => {
+                setFetchData({...helpers.testData})
+                expect.assertions(1);
+
+                return HttpService.post<{name: string}>({
+                    url: helpers.urlSegment,
+                    responseConfig: {
+                        // @ts-ignore
+                        successCallback: (data: {name :string}) => ({name :data.name +='!'})
+                    }
+                }).then(data => expect(data.name).toEqual(helpers.testData.name +='!'))
+            })
+
+            it('error null is removed from data', () => {
+                setFetchData({...helpers.testData, error: null})
+                expect.assertions(1);
+
+                return HttpService.get({
+                    url: helpers.urlSegment,
+                }).then(data => expect(data).toEqual(helpers.testData))
+            })
+
+            it('warn null is removed from data', () => {
+                setFetchData({...helpers.testData, warn: null})
+                expect.assertions(1);
+
+                return HttpService.get({
+                    url: helpers.urlSegment,
+                }).then(data => expect(data).toEqual(helpers.testData))
+            })
+
         })
 
-        it('xd', () => {
-            HttpService.get({url: '2', responseConfig: {errors: [[['x']]], defaultError: 'default'}})
-                .then(() => console.log('xd'));
+
+        describe('error response', () => {
+            it('set network error at fetch reject', () => {
+                setRejectedFetch(helpers.connectionError)
+                expect.assertions(2);
+                return HttpService.get({
+                    url: helpers.urlSegment
+                }).finally(() => {
+                    expect(assertions.connectionError).toEqual(helpers.connectionError)
+                    expect(assertions.dataToErrorCallback).toEqual({
+                        error: helpers.connectionError,
+                        errors: [[helpers.defaultError]],
+                        defaultError: helpers.defaultError
+                    })
+                })
+            })
+
+            it('default error set on error get', () => {
+                setFetchData({...helpers.testData}, helpers.errorFromServer )
+                expect.assertions(2);
+
+                return HttpService.get({
+                    url: helpers.urlSegment,
+                }).finally(() => {
+                    expect(assertions.error).toEqual(helpers.defaultError)
+                    expect(assertions.dataToErrorCallback).toEqual({
+                        error: helpers.errorFromServer,
+                        errors: [[helpers.defaultError]],
+                        defaultError: helpers.defaultError
+                    })
+                })
+            })
+
+            it('custom error set on error get', () => {
+                setFetchData({...helpers.testData}, helpers.errorFromServer )
+                expect.assertions(1);
+
+                return HttpService.get({
+                    url: helpers.urlSegment,
+                    responseConfig: {
+                        errorCallback: () => assertions.error = helpers.customError
+                    }
+                }).finally(() => expect(assertions.error).toEqual(helpers.customError))
+            })
+
         })
     })
 });
