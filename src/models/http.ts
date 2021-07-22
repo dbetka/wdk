@@ -1,20 +1,26 @@
 import { ErrorsDictionary } from './errors';
 
-type SuccessFunction = <T>(data: unknown) => T;
-type ErrorFunction = (error: string, defaultError: string, errors: ErrorsDictionary) => unknown;
+type SuccessFunction = <T>(data: any) => T;
+type ErrorFunction = (error: string, defaultError: string, errors: ErrorsDictionary) => void;
+type WarnFunction = (warn: string, defaultWarn: string, warns: ErrorsDictionary) => void;
 
 export interface HttpServiceConfig {
   apiUrl: string;
-  connectionErrorCallback: (error: string) => void;
+  defaultRequestConfig: RequestInit;
+  connectionErrorCallback: ErrorFunction;
   defaultErrorCallback: ErrorFunction;
   defaultSuccessCallback: SuccessFunction;
-  defaultRequestConfig: RequestInit;
+  defaultWarnCallback: WarnFunction;
+  defaultError: string
+  defaultWarn: string
+  defaultErrors: ErrorsDictionary
+  defaultWarns: ErrorsDictionary
 }
 
 export interface HttpBaseConfig {
   url: string;
   requestConfig?: RequestInit;
-  responseConfig: ResponseConfig;
+  responseConfig?: ResponseConfig;
 }
 
 export interface HttpQueryConfig extends HttpBaseConfig {
@@ -30,8 +36,11 @@ export interface HttpConfig extends HttpCommandConfig {
 }
 
 export interface ResponseConfig {
+  defaultWarn?: string,
+  defaultError?: string,
+  warns?: ErrorsDictionary
+  errors?: ErrorsDictionary
   successCallback?: SuccessFunction
   errorCallback?: ErrorFunction
-  defaultError: string
-  errors: ErrorsDictionary
+  warnCallback?: WarnFunction
 }
