@@ -1,87 +1,95 @@
-import {HttpCommandConfig, HttpConfig, HttpQueryConfig, HttpServiceConfig, ResponseConfig} from './models/http';
+import {
+    ErrorFunction,
+    HttpCommandConfig,
+    HttpConfig,
+    HttpQueryConfig,
+    HttpServiceConfig,
+    ResponseConfig
+} from './models/http';
 import {WithErrorField, WithWarnField} from "./models/errors";
 
-export class HttpService {
-    private static config: HttpServiceConfig;
+export class HttpService<ErrorOptions, WarnOptions> {
+    private static config: HttpServiceConfig<any, any>
+    private static instance: unknown;
 
-    constructor(config?: HttpServiceConfig) {
-        if (config) {
-            HttpService.config = Object.freeze(config);
+    private constructor() {}
+
+    public static getInstance<ErrorOptions, WarnOption>(
+        config: HttpServiceConfig<ErrorOptions, WarnOption>
+    ): HttpService<ErrorOptions, WarnOption> {
+
+        if(!HttpService.instance) {
+            this.instance = new HttpService<ErrorOptions, WarnOption>()
+            this.config = config as HttpServiceConfig<ErrorOptions, WarnOption>
         }
-        if (!this.config) {
-            // tslint:disable-next-line:no-console
-            console.warn('Please provide configuration!!');
-        }
+        return HttpService.instance as HttpService<ErrorOptions, WarnOption>
     }
 
-    get config(): HttpServiceConfig {
+    get config(): HttpServiceConfig<ErrorOptions, WarnOptions> {
         return HttpService.config;
     }
-    public static changeGlobalConfig(partialConfig: Partial<HttpServiceConfig>) {
-        HttpService.config = Object.freeze({...this.config, ...partialConfig})
+
+    public changeConfig(partialConfig: Partial<HttpServiceConfig<ErrorOptions, WarnOptions>>): void {
+        HttpService.config = {...this.config, ...partialConfig}
     }
 
-    public static get<T>(options: HttpQueryConfig): Promise<T> {
+    public get<T>(options: HttpQueryConfig<ErrorOptions, WarnOptions>): Promise<T> {
         const { url, queryParamsObject } = options;
 
         const pathVariables = queryParamsObject
             ? HttpService.dataToPathVariables(queryParamsObject)
             : '';
 
-        const requestParams = {...options, url: url + pathVariables, method: 'GET'} as HttpConfig
+        const requestParams = {...options, url: url + pathVariables, method: 'GET'} as HttpConfig<ErrorOptions, WarnOptions>
 
-        return HttpService.handleRequest(requestParams);
+        return this.handleRequest(requestParams);
     }
 
-    public static post<T>(options: HttpCommandConfig): Promise<T> {
-        return HttpService.handleRequest({...options, method: 'POST'});
+    public  post<T>(options: HttpCommandConfig<ErrorOptions, WarnOptions>): Promise<T> {
+        return this.handleRequest({...options, method: 'POST'});
     }
 
-    public static put<T>(options: HttpCommandConfig): Promise<T> {
-        return HttpService.handleRequest({...options, method: 'PUT'});
+    public  put<T>(options: HttpCommandConfig<ErrorOptions, WarnOptions>): Promise<T> {
+        return this.handleRequest({...options, method: 'PUT'});
     }
 
-    public static delete<T>(options: HttpCommandConfig): Promise<T> {
-        return HttpService.handleRequest<T>({...options, method: 'DELETE'});
+    public  delete<T>(options: HttpCommandConfig<ErrorOptions, WarnOptions>): Promise<T> {
+        return this.handleRequest<T>({...options, method: 'DELETE'});
     }
 
-    private static handleRequest<T>(options: HttpConfig): Promise<T> {
-        const { url, requestConfig, responseConfig = {} }  = HttpService.prepareRequestData(options)
-        const preparedResponseConfig = HttpService.prepareResponseData(responseConfig)
-        const { defaultError, errors } = preparedResponseConfig;
+    private  handleRequest<T>(options: HttpConfig<ErrorOptions, WarnOptions>): Promise<T> {
+        const { url, requestConfig, responseConfig = {} }  = this.prepareRequestData(options)
+        const preparedResponseConfig = this.prepareResponseData(responseConfig)
+        const { errorConfig } = preparedResponseConfig;
 
-        return new Promise<T>((resolve, reject) => {
+        let requestResult = new Promise<T>((resolve, reject) => {
             fetch(url, {
                 ...this.config.defaultRequestConfig,
                 ...requestConfig,
                 })
-                .then(response => HttpService.handleResponse<T>(
+                .then(response => this.handleResponse<T>(
                     response,
                     preparedResponseConfig,
                     resolve,
                     reject)
                 )
-                .catch(
-                    // Catch error from network and throw it further
-                    (error: string) => reject({
-                        error,
-                        defaultError,
-                        errors,
-                        errorCallback: this.config.connectionErrorCallback
-                    }
-                ));
-            }).catch(
-            // Catch errors from network (catch above) or business error that has been thrown in handleResponse
+                .catch((error) => reject(this.errorAction(error, this.config.connectionErrorCallback, errorConfig)))
+        })
+
+        if (this.config.earlyCatchStrategy) {
+            return requestResult.catch(
                 ({
-                    error,
-                    defaultError,
-                    errors,
-                    errorCallback
-                }) => errorCallback(error, defaultError, errors))
+                     error,
+                     errorConfig,
+                     errorCallback
+                 }) => errorCallback(error, this.config.defaultErrorConfig, errorConfig ))
+            }
+
+        return requestResult
     }
-    private static handleResponse<T>(
+    private  handleResponse<T>(
         response: Response,
-        responseConfig: Required<ResponseConfig>,
+        responseConfig: Required<ResponseConfig<ErrorOptions, WarnOptions>>,
         resolve: (value: T | PromiseLike<T>) => void,
         reject: (reason?: any) => void
     ) {
@@ -89,27 +97,53 @@ export class HttpService {
             successCallback,
             errorCallback,
             warnCallback,
-            defaultError,
-            errors,
-            defaultWarn,
-            warns,
+            errorConfig,
+            warnConfig
         } = responseConfig
 
         response.json()
             .then(data => {
                     HttpService.hasWarn(data)
-                        ? warnCallback(data.warn, defaultWarn, warns)
+                        ? warnCallback(data.warn, warnConfig, this.config.defaultWarnConfig)
                         : null
                     HttpService.hasNoError(data)
                         ? resolve(successCallback<T>(data))
-                        : reject({
-                            error: data.error,
-                            errors,
-                            defaultError,
-                            errorCallback
-                        })
+                        : reject(this.errorAction(data.error, errorCallback, errorConfig))
                 }
             )
+    }
+
+
+
+    private prepareResponseData(responseConfig: ResponseConfig<ErrorOptions, WarnOptions>): Required<ResponseConfig<ErrorOptions, WarnOptions>> {
+
+        responseConfig.successCallback = responseConfig?.successCallback ?? this.config.defaultSuccessCallback;
+        responseConfig.warnCallback = responseConfig?.warnCallback ?? this.config.defaultWarnCallback;
+        responseConfig.errorCallback = responseConfig?.errorCallback ?? this.config.defaultErrorCallback;
+
+        return responseConfig as Required<ResponseConfig<ErrorOptions, WarnOptions>>
+    }
+
+
+    private prepareRequestData(options: HttpConfig<ErrorOptions, WarnOptions>): HttpConfig<ErrorOptions, WarnOptions> {
+        const {body, method, requestConfig = {}} = options;
+        options.url = this.config.apiUrl + options.url;
+        requestConfig.method = method;
+
+        if (body) {
+            requestConfig.body = JSON.stringify(body);
+        }
+
+        options.requestConfig = requestConfig;
+        return options;
+    }
+
+    private errorAction(error: string, errorCallback: ErrorFunction<ErrorOptions>, errorConfig?: ErrorOptions )
+    : { error: string, errorConfig?: ErrorOptions, errorCallback: ErrorFunction<ErrorOptions> } | string | Error {
+        if (this.config.earlyCatchStrategy) {
+            return { error, errorConfig, errorCallback }
+        }
+        return errorCallback(error, this.config.defaultErrorConfig, errorConfig)
     }
 
     private static hasNoError(data: WithErrorField<unknown>) {
@@ -129,32 +163,6 @@ export class HttpService {
         } else {
             return true
         }
-    }
-
-    private static prepareResponseData(responseConfig: ResponseConfig): Required<ResponseConfig> {
-        // Set default property/method from HttpServiceConfig if custom is not provided for this request
-        responseConfig.successCallback = responseConfig?.successCallback ?? this.config.defaultSuccessCallback;
-        responseConfig.warnCallback = responseConfig?.warnCallback ?? this.config.defaultWarnCallback;
-        responseConfig.errorCallback = responseConfig?.errorCallback ?? this.config.defaultErrorCallback;
-        responseConfig.warns = responseConfig?.warns ?? this.config.defaultWarns
-        responseConfig.defaultWarn = responseConfig?.defaultWarn ?? this.config.defaultWarn
-        responseConfig.defaultError = responseConfig?.defaultError ?? this.config.defaultError
-        responseConfig.errors = responseConfig?.errors ?? this.config.defaultErrors
-
-        return responseConfig as Required<ResponseConfig>
-    }
-
-
-    private static prepareRequestData(options: HttpConfig): HttpConfig {
-        const {body, requestConfig = {}} = options;
-
-        options.url = this.config.apiUrl + options.url;
-
-        if (body) {
-            requestConfig.body = JSON.stringify(body);
-        }
-
-        return options;
     }
 
     private static dataToPathVariables(data: Object): string {
