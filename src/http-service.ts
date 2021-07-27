@@ -15,10 +15,13 @@ export class HttpService<ErrorOptions, WarnOptions> {
     private constructor() {}
 
     public static getInstance<ErrorOptions, WarnOption>(
-        config: HttpServiceConfig<ErrorOptions, WarnOption>
+        config?: HttpServiceConfig<ErrorOptions, WarnOption>
     ): HttpService<ErrorOptions, WarnOption> {
 
         if(!HttpService.instance) {
+            if(!config) {
+                throw Error('You have to provide config with first getInstance() execution')
+            }
             this.instance = new HttpService<ErrorOptions, WarnOption>()
             this.config = config as HttpServiceConfig<ErrorOptions, WarnOption>
         }
