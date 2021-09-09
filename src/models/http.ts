@@ -23,7 +23,7 @@ export interface HttpBaseConfig<ErrorOptions, WarnOptions> {
 
 export interface HttpQueryConfig<ErrorOptions, WarnOptions>
     extends HttpBaseConfig<ErrorOptions, WarnOptions> {
-  queryParamsObject?: Object;
+  queryObject?: Object;
 }
 
 export interface HttpCommandConfig<ErrorOptions, WarnOptions>

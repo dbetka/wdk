@@ -37,10 +37,10 @@ export class HttpService<ErrorOptions, WarnOptions> {
     }
 
     public get<T>(options: HttpQueryConfig<ErrorOptions, WarnOptions>): Promise<T> {
-        const { url, queryParamsObject } = options;
+        const { url, queryObject } = options;
 
-        const pathVariables = queryParamsObject
-            ? HttpService.dataToPathVariables(queryParamsObject)
+        const pathVariables = queryObject
+            ? HttpService.dataToPathVariables(queryObject)
             : '';
 
         const requestParams = {...options, url: url + pathVariables, method: 'GET'} as HttpConfig<ErrorOptions, WarnOptions>
