@@ -1,11 +1,11 @@
 export type SuccessFunction<In, Out> = (data: In) => Out
-export type ErrorFunction<T> = (error: number, options: T) => number | Error;
+export type ErrorFunction<ErrorOptions, ServerError> = (error: ServerError, options: ErrorOptions) => number | Error | void | string;
 
-export interface HttpServiceConfig<ErrorOptions> {
+export interface HttpServiceConfig<ErrorOptions, ServerError> {
   apiUrl: string;
   defaultRequestConfig: RequestInit;
-  connectionErrorCallback: ErrorFunction<ErrorOptions>;
-  defaultErrorCallback: ErrorFunction<ErrorOptions>;
+  connectionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  defaultErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
 }
 
 export interface HttpBaseConfig<In, Out, ErrorOptions> {

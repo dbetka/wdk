@@ -6,11 +6,11 @@ import {
   SuccessFunction,
 } from './models/http';
 
-export class HttpService<ErrorOptions> {
-  private config? : HttpServiceConfig<ErrorOptions>;
+export class HttpService<ErrorOptions, ServerError> {
+  private config? : HttpServiceConfig<ErrorOptions, ServerError>;
 
-  public static createInstance<ErrorOptions> (config: HttpServiceConfig<ErrorOptions>): HttpService<ErrorOptions> {
-    const instance = new HttpService<ErrorOptions>();
+  public static createInstance<ErrorOptions, ServerError> (config: HttpServiceConfig<ErrorOptions, ServerError>): HttpService<ErrorOptions, ServerError> {
+    const instance = new HttpService<ErrorOptions, ServerError>();
     instance.config = config;
     return instance;
   }
