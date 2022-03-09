@@ -67,11 +67,25 @@ export class HttpService<ErrorOptions, ServerError> {
 
     response.json()
       .then(data => {
-        HttpService.hasNoError(response)
-          ? successCallback
-            ? resolve(successCallback(data))
-            : resolve(data)
-          : reject(this.config?.defaultErrorCallback(data, errorOptions));
+        switch (response.status) {
+          case 200: {
+            successCallback
+              ? resolve(successCallback(data))
+              : resolve(data);
+            break;
+          }
+          case 401: {
+            reject(this.config?.permissionErrorCallback(data, errorOptions));
+            break;
+          }
+          case 500: {
+            reject(this.config?.serverErrorCallback(data, errorOptions));
+            break;
+          }
+          default: {
+            reject(this.config?.defaultErrorCallback(data, errorOptions));
+          }
+        }
       },
       );
   }
@@ -87,10 +101,6 @@ export class HttpService<ErrorOptions, ServerError> {
 
     options.requestConfig = requestConfig;
     return options;
-  }
-
-  private static hasNoError (response: Response) {
-    return response.status === 200;
   }
 
   private static dataToPathVariables (data: {[key:string]: string | number}): string {

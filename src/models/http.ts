@@ -6,6 +6,8 @@ export interface HttpServiceConfig<ErrorOptions, ServerError> {
   defaultRequestConfig: RequestInit;
   connectionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
   defaultErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  permissionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  serverErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
 }
 
 export interface HttpBaseConfig<In, Out, ErrorOptions> {
