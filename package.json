@@ -8,10 +8,7 @@
   "scripts": {
     "test": "jest --config jest.config.json",
     "build": "tsc",
-    "lint": "tslint -p tsconfig.json",
-    "version": "git add -A src",
-    "postversion": "git push && git push --tags",
-    "publish": "npm publish --access public"
+    "lint": "tslint -p tsconfig.json"
   },
   "files": [
     "lib/**/*"
@@ -32,7 +29,7 @@
     "@types/progress": "^2.0.5",
     "@types/webpack": "^5.28.0",
     "babel-eslint": "^10.1.0",
-    "chalk": "^2.0.3",
+    "chalk": "^4.1.2",
     "console-table-printer": "^2.11.0",
     "dayjs": "^1.11.1",
     "jest": "^26.6.3",

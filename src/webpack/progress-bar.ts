@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import * as chalk from 'chalk'
 import * as ProgressBar from 'progress'
 import * as webpack from 'webpack'
 
@@ -24,7 +24,7 @@ export declare interface ProgressBarPluginType {
 
 export function progressBarPlugin (): ProgressBarPluginType {
   const options: ProgressBarPluginOptionsType = {
-    format: `  Build ${chalk.bgBlackBright(':bar')} ${chalk.green.bold(':percent')} `,
+    format: `  Build ${chalk.bgGray(':bar')} ${chalk.green.bold(':percent')} `,
     renderThrottle: 100,
     total: 200,
     width: 30,
