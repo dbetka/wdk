@@ -104,26 +104,26 @@ export class AppConsoleFramePlugin {
       maxAssetSize = performance?.maxAssetSize || 0;
     }
 
-      for (const assetName in stats.compilation.assets) {
-        if (stats.compilation.assets.hasOwnProperty(assetName)) {
-          const asset = stats.compilation.assets[assetName];
-          const assetExt = assetName.split('.').pop() || '';
-          const assetSize = (Math.round(asset.size() / 1024)) + ' KB';
+    for (const assetName in stats.compilation.assets) {
+      if (stats.compilation.assets.hasOwnProperty(assetName)) {
+        const asset = stats.compilation.assets[assetName];
+        const assetExt = assetName.split('.').pop() || '';
+        const assetSize = (Math.round(asset.size() / 1024)) + ' KB';
 
-          const firstAssetNamePart = assetName.split('.')[0];
-          const secondAssetNamePart = assetName.split('.').splice(1).join('.');
-          const styledAssetName = chalk.reset.bold(firstAssetNamePart) + chalk.gray('.' + secondAssetNamePart);
+        const firstAssetNamePart = assetName.split('.')[0];
+        const secondAssetNamePart = assetName.split('.').splice(1).join('.');
+        const styledAssetName = chalk.reset.bold(firstAssetNamePart) + chalk.gray('.' + secondAssetNamePart);
 
-          const isOverSizeLimit = asset.size() > maxAssetSize;
-          const writeWithColor = chalk.bold[isOverSizeLimit && isProductionMode ? 'yellow' : 'green'];
+        const isOverSizeLimit = asset.size() > maxAssetSize;
+        const writeWithColor = chalk.bold[isOverSizeLimit && isProductionMode ? 'yellow' : 'green'];
 
-          if (availableExt.includes(assetExt)) {
-            table.addRow({ file: styledAssetName, size: writeWithColor(assetSize) });
-          }
-          const tableWithoutHeader = table.render().split('\n').splice(3).join('\n');
-          this.write(tableWithoutHeader);
+        if (availableExt.includes(assetExt)) {
+          table.addRow({ file: styledAssetName, size: writeWithColor(assetSize) });
         }
       }
+    }
+    const tableWithoutHeader = table.render().split('\n').splice(3).join('\n');
+    this.write(tableWithoutHeader);
   }
 
   write (text: string) {
