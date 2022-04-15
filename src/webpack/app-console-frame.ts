@@ -14,13 +14,23 @@ declare interface AppConsoleFramePluginConfigType {
   target: string
 }
 
-export class AppConsoleFramePlugin {
+export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
+  const progressBar = progressBarPlugin()
+  const mainPlugin = new AppConsoleFramePlugin(config, progressBar)
+
+  return [
+    mainPlugin,
+    progressBar.plugin,
+  ]
+}
+
+class AppConsoleFramePlugin {
   config: AppConsoleFramePluginConfigType
   progressBar: ProgressBarPluginType
 
-  constructor (config:AppConsoleFramePluginConfigType) {
+  constructor (config: AppConsoleFramePluginConfigType, progressBar: ProgressBarPluginType) {
     this.config = config;
-    this.progressBar = progressBarPlugin();
+    this.progressBar = progressBar;
   }
 
   apply (compiler: Compiler) {
