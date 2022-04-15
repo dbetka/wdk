@@ -1,45 +1,33 @@
-type SuccessFunction = <T>(data: any) => T;
-export type ErrorFunction<T> = (error: string, defaultOptions: T, options?: Partial<T>) => string | Error;
-type WarnFunction<T> = (warn: string,  defaultOptions: T, options?: Partial<T>,) => void;
+export type SuccessFunction<In, Out> = (data: In) => Out
+export type ErrorFunction<ErrorOptions, ServerError> = (error: ServerError, options: ErrorOptions) => number | Error | void | string;
 
-
-export interface HttpServiceConfig<ErrorOptions, WarnOptions> {
+export interface HttpServiceConfig<ErrorOptions, ServerError> {
   apiUrl: string;
   defaultRequestConfig: RequestInit;
-  earlyCatchStrategy: boolean
-  connectionErrorCallback: ErrorFunction<ErrorOptions>;
-  defaultErrorCallback: ErrorFunction<ErrorOptions>;
-  defaultSuccessCallback: SuccessFunction;
-  defaultWarnCallback: WarnFunction<WarnOptions>;
-  defaultErrorConfig: ErrorOptions
-  defaultWarnConfig: WarnOptions
+  connectionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  defaultErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  permissionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
+  serverErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
 }
 
-export interface HttpBaseConfig<ErrorOptions, WarnOptions> {
+export interface HttpBaseConfig<In, Out, ErrorOptions> {
   url: string;
+  errorOptions: ErrorOptions
   requestConfig?: RequestInit;
-  responseConfig?: ResponseConfig<ErrorOptions, WarnOptions>;
+  successCallback?: SuccessFunction<In, Out>
 }
 
-export interface HttpQueryConfig<ErrorOptions, WarnOptions>
-    extends HttpBaseConfig<ErrorOptions, WarnOptions> {
-  queryObject?: Object;
+export interface HttpQueryConfig<In, Out, ErrorOptions>
+    extends HttpBaseConfig<In, Out, ErrorOptions> {
+  queryObject?: {[key:string]: string | number}
 }
 
-export interface HttpCommandConfig<ErrorOptions, WarnOptions>
-    extends HttpBaseConfig<ErrorOptions, WarnOptions> {
+export interface HttpCommandConfig<In, Out, ErrorOptions>
+    extends HttpBaseConfig<In, Out, ErrorOptions> {
   body?: unknown;
 }
 
-export interface HttpConfig<ErrorOptions, WarnOptions>
-    extends HttpCommandConfig<ErrorOptions, WarnOptions> {
+export interface HttpConfig<In, Out, ErrorOptions>
+    extends HttpCommandConfig<In, Out, ErrorOptions> {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-}
-
-export interface ResponseConfig<ErrorOptions, WarnOptions> {
-  successCallback?: SuccessFunction
-  errorCallback?: ErrorFunction<ErrorOptions>
-  warnCallback?: WarnFunction<WarnOptions>
-  errorConfig?: ErrorOptions
-  warnConfig?: WarnOptions
 }

@@ -1,6 +1,6 @@
 {
   "name": "@dbetka/wdk",
-  "version": "0.1.4",
+  "version": "0.1.8",
   "description": "Web Development Kit for dbetka projects",
   "license": "MIT",
   "main": "lib/index.js",
@@ -8,12 +8,9 @@
   "scripts": {
     "test": "jest --config jest.config.json",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
+    "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "publish": "npm publish --access public"
   },
