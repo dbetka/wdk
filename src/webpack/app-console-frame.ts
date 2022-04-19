@@ -10,6 +10,7 @@ dayjs.extend(duration);
 
 declare interface AppConsoleFramePluginConfigType {
   appName: string
+  isClientApp?: boolean
   appVersion: string
   target: string
 }
@@ -35,7 +36,8 @@ class AppConsoleFramePlugin {
 
   apply (compiler: Compiler) {
     const pluginName = AppConsoleFramePlugin.name;
-    const { appName, appVersion, target } = this.config;
+    const { appName, isClientApp = true, appVersion, target } = this.config;
+    const clientText = isClientApp ? ' Client' : ''
     const mode = this.capitalizeFirstChar(compiler.options.mode ? compiler.options.mode : '');
     const targetText = this.capitalizeFirstChar(target);
     const watch = this.capitalizeFirstChar(compiler.options.watch ? 'watch' : 'single run');
@@ -43,7 +45,7 @@ class AppConsoleFramePlugin {
     const makeLogo = () => {
       this.clear();
       this.newLine();
-      this.writeLogo(`${appName} Client v${appVersion}`, 44);
+      this.writeLogo(`${appName}${clientText} v${appVersion}`, 44);
       this.newLine();
       this.write(`  ${mode} - ${targetText} - ${watch}`);
       this.newLine(2);
