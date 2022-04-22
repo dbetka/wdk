@@ -17,7 +17,7 @@ declare interface ProgressBarPluginOptionsType {
 }
 
 export declare interface ProgressBarPluginType {
-  plugin: webpack.ProgressPlugin
+  plugin: webpack.ProgressPlugin | undefined
   stop(): void
   start(): void
 }
@@ -40,7 +40,11 @@ export function progressBarPlugin (): ProgressBarPluginType {
   const enabled = stream && stream.isTTY;
 
   if (!enabled) {
-    throw new Error('ProgressBarPlugin: stream is not available')
+    return {
+      plugin: undefined,
+      stop: () => undefined,
+      start: () => undefined,
+    }
   }
 
   const barLeft = chalk.bold('[');
