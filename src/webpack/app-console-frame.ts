@@ -13,6 +13,13 @@ declare interface AppConsoleFramePluginConfigType {
   isClientApp?: boolean
   appVersion: string
   target: string
+  onBuildDone?: [
+    {
+      name: string
+      method(): Promise<string|undefined>
+      output?: boolean
+    }
+  ]
 }
 
 export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
@@ -80,13 +87,46 @@ class AppConsoleFramePlugin {
           this.newLine();
           this.write(chalk.green.bold(`  Build completed in ${time}s`));
           this.newLine(2);
-          setTimeout(() => {
-            if (compiler.options.watch) {
-              this.write('  Waiting for changes...');
+
+          const additionalActivity = []
+          const onBuildDone = this.config.onBuildDone
+          const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0
+
+          if (onBuildDoneDefined) {
+            this.write(chalk.bold(`  Additional activities:`));
+            this.newLine();
+
+            for (const activity of onBuildDone) {
+              this.write(`  - ${activity.name}`);
+              const activityPromise = activity.method();
+              activityPromise
+                .then(output => {
+                  this.write(chalk.green.bold(`    Done!`))
+                  if (activity.output && output) {
+                    this.newLine()
+                    this.write(output)
+                  }
+                })
+                .catch(error => {
+                  this.newLine()
+                  this.write(chalk.red.bold(`  ${error}`))
+                })
+                .finally(() => this.newLine());
+              additionalActivity.push(activityPromise)
             }
-          }, 100);
+          }
+
+          Promise.allSettled(additionalActivity).then(() => {
+            if (onBuildDoneDefined) this.newLine()
+
+            setTimeout(() => {
+              if (compiler.options.watch) {
+                this.write('  Waiting for changes...');
+              }
+            }, 100);
+            callback();
+          })
         });
-        callback();
       },
     );
   }
