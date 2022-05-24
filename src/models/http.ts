@@ -2,6 +2,7 @@ export type SuccessFunction<In, Out> = (data: In) => Out
 export type ErrorFunction<ErrorOptions, ServerError> = (error: ServerError, options: ErrorOptions) => number | Error | void | string;
 
 export interface HttpServiceConfig<ErrorOptions, ServerError> {
+  fetchProxy?(): Promise<Response>;
   apiUrl: string;
   defaultRequestConfig: RequestInit;
   connectionErrorCallback: ErrorFunction<ErrorOptions, ServerError>;
