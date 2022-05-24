@@ -88,47 +88,55 @@ class AppConsoleFramePlugin {
           this.write(chalk.green.bold(`  Build completed in ${time}s`));
           this.newLine(2);
 
-          const additionalActivity = []
-          const onBuildDone = this.config.onBuildDone
-          const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0
-
-          if (onBuildDoneDefined) {
-            this.write(chalk.bold(`  Additional activities:`));
-            this.newLine();
-
-            for (const activity of onBuildDone) {
-              this.write(`  - ${activity.name}`);
-              const activityPromise = activity.method();
-              activityPromise
-                .then(output => {
-                  this.write(chalk.green.bold(`    Done!`))
-                  if (activity.output && output) {
-                    this.newLine()
-                    this.write(output)
-                  }
-                })
-                .catch(error => {
-                  this.newLine()
-                  this.write(chalk.red.bold(`  ${error}`))
-                })
-                .finally(() => this.newLine());
-              additionalActivity.push(activityPromise)
-            }
-          }
-
-          Promise.allSettled(additionalActivity).then(() => {
-            if (onBuildDoneDefined) this.newLine()
-
-            setTimeout(() => {
-              if (compiler.options.watch) {
-                this.write('  Waiting for changes...');
-              }
-            }, 100);
-            callback();
-          })
+          setTimeout(() => {
+            this.runAdditionalActivities()
+              .then(() => {
+                if (compiler.options.watch) {
+                  this.write('  Waiting for changes...');
+                }
+              })
+          }, 100);
         });
+        callback();
       },
     );
+  }
+
+  runAdditionalActivities () {
+    const additionalActivity = []
+    const onBuildDone = this.config.onBuildDone
+    const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0
+
+    if (onBuildDoneDefined) {
+      this.write(chalk.bold(`  Additional activities:`));
+      this.newLine();
+
+      for (const activity of onBuildDone) {
+        this.write(`  - ${activity.name}`);
+        const activityPromise = activity.method();
+        activityPromise
+          .then(output => {
+            this.write(chalk.green.bold(`    Done!`))
+            if (activity.output && output) {
+              this.newLine()
+              this.write(output)
+            }
+          })
+          .catch(error => {
+            this.newLine()
+            this.write(chalk.red.bold(`  ${error}`))
+          })
+          .finally(() => this.newLine());
+        additionalActivity.push(activityPromise)
+      }
+    }
+
+    const allPromises = Promise.allSettled(additionalActivity)
+    allPromises.then(() => {
+      if (onBuildDoneDefined) this.newLine(2)
+    })
+
+    return allPromises
   }
 
   capitalizeFirstChar (text: string) {
