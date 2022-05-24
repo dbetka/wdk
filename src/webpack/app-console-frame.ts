@@ -77,27 +77,27 @@ class AppConsoleFramePlugin {
           callback();
           return;
         }
-
-        const time = Math.abs(dayjs(stats.startTime).diff(stats.endTime, 'second', true));
-
-        process.stderr.cursorTo(0, 6, () => {
-          this.writeAssetsSizes(stats);
-          this.newLine();
-          this.write(chalk.green('  Done at ' + chalk.bold(dayjs().format('HH:mm:ss'))));
-          this.newLine();
-          this.write(chalk.green.bold(`  Build completed in ${time}s`));
-          this.newLine(2);
-
-          setTimeout(() => {
-            this.runAdditionalActivities()
-              .then(() => {
-                if (compiler.options.watch) {
-                  this.write('  Waiting for changes...');
-                }
-              })
-          }, 100);
-        });
         callback();
+
+        setTimeout(() => {
+          process.stderr.cursorTo(0, 6, () => {
+            const time = Math.abs(dayjs(stats.startTime).diff(stats.endTime, 'second', true));
+
+            this.writeAssetsSizes(stats);
+            this.newLine();
+            this.write(chalk.green('  Done at ' + chalk.bold(dayjs().format('HH:mm:ss'))));
+            this.newLine();
+            this.write(chalk.green.bold(`  Build completed in ${time}s`));
+            this.newLine(2);
+
+              this.runAdditionalActivities()
+                .then(() => {
+                  if (compiler.options.watch) {
+                    this.write('  Waiting for changes...');
+                  }
+                })
+          });
+        }, 200);
       },
     );
   }
