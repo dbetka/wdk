@@ -93,6 +93,7 @@ class AppConsoleFramePlugin {
               this.runAdditionalActivities()
                 .then(() => {
                   if (compiler.options.watch) {
+                    this.newLine()
                     this.write('  Waiting for changes...');
                   }
                 })
@@ -102,8 +103,7 @@ class AppConsoleFramePlugin {
     );
   }
 
-  runAdditionalActivities () {
-    const additionalActivity = []
+  async runAdditionalActivities () {
     const onBuildDone = this.config.onBuildDone
     const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0
 
@@ -112,31 +112,22 @@ class AppConsoleFramePlugin {
       this.newLine();
 
       for (const activity of onBuildDone) {
-        this.write(`  - ${activity.name}`);
-        const activityPromise = activity.method();
-        activityPromise
-          .then(output => {
-            this.write(chalk.green.bold(`    Done!`))
-            if (activity.output && output) {
-              this.newLine()
-              this.write(output)
-            }
-          })
-          .catch(error => {
-            this.newLine()
-            this.write(chalk.red.bold(`  ${error}`))
-          })
-          .finally(() => this.newLine());
-        additionalActivity.push(activityPromise)
+        try {
+          this.write(`  - ${activity.name}`);
+          const activityOutput = await activity.method();
+          this.write(chalk.green.bold(`    Done!`))
+          this.newLine()
+          if (activity.output && activityOutput) this.write(activityOutput)
+
+        } catch (error) {
+          this.write(chalk.red.bold(`    Failed!`))
+          this.newLine(2)
+          this.write(String(error))
+        }
       }
     }
 
-    const allPromises = Promise.allSettled(additionalActivity)
-    allPromises.then(() => {
-      if (onBuildDoneDefined) this.newLine(2)
-    })
-
-    return allPromises
+    return Promise.resolve()
   }
 
   capitalizeFirstChar (text: string) {
