@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.13] – 2022-08-23
+### Changed
+- AppConsoleFrame: Clear console down before each write usage
+- Remove npm dependencies vulnerabilities
+
 ## [0.2.12] – 2022-08-23
 ### Changed
 - AppConsoleFrame: Clear line before write
