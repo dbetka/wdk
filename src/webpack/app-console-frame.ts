@@ -50,7 +50,7 @@ class AppConsoleFramePlugin {
     const watch = this.capitalizeFirstChar(compiler.options.watch ? 'watch' : 'single run');
 
     const makeLogo = () => {
-      this.clear();
+      this.clearConsole();
       this.newLine();
       this.writeLogo(`${appName}${clientText} v${appVersion}`, 44);
       this.newLine();
@@ -80,7 +80,7 @@ class AppConsoleFramePlugin {
         callback();
 
         setTimeout(() => {
-          process.stderr.cursorTo(0, 6, () => {
+          process.stdout.cursorTo(0, 6, () => {
             const time = Math.abs(dayjs(stats.startTime).diff(stats.endTime, 'second', true));
 
             this.writeAssetsSizes(stats);
@@ -177,16 +177,28 @@ class AppConsoleFramePlugin {
     this.write(tableWithoutHeader);
   }
 
-  write (text: string) {
-    process.stderr.write(text);
+  clearConsole () {
+    process.stdout.write('\x1Bc');
+  }
+
+  clearLine () {
+    process.stdout.clearLine(0)
+  }
+
+  clearRight () {
+    process.stdout.clearLine(1)
   }
 
   newLine (numberOfNewLines = 1) {
-    process.stderr.write('\n'.repeat(numberOfNewLines));
+    for (let i = 0; i < numberOfNewLines; ++i) {
+      process.stdout.write('\n')
+      this.clearLine()
+    }
   }
 
-  clear () {
-    process.stdout.write('\x1Bc');
+  write (text: string) {
+    this.clearRight()
+    process.stdout.write(text);
   }
 
   tableConfig () {
