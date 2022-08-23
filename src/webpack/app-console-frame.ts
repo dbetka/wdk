@@ -190,15 +190,21 @@ class AppConsoleFramePlugin {
     process.stdout.clearLine(1)
   }
 
+  clearDown () {
+    process.stdout.clearScreenDown()
+  }
+
   newLine (numberOfNewLines = 1) {
     for (let i = 0; i < numberOfNewLines; ++i) {
       process.stdout.write('\n')
       this.clearLine()
+      this.clearDown()
     }
   }
 
   write (text: string) {
     this.clearRight()
+    this.clearDown()
     process.stdout.write(text);
   }
 
