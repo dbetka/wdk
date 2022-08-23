@@ -123,6 +123,7 @@ class AppConsoleFramePlugin {
           this.write(chalk.red.bold(`    Failed!`))
           this.newLine(2)
           this.write(String(error))
+          process.exit(1)
         }
       }
     }
