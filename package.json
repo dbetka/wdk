@@ -1,6 +1,6 @@
 {
   "name": "@dbetka/wdk",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Web Development Kit for dbetka projects",
   "license": "MIT",
   "main": "lib/index.js",
