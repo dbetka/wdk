@@ -83,13 +83,23 @@ module.exports = {
 Available configuration
 -------------------------
 
-| Name                         | Description                                                                                                                                                            |
-|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **appName:** string          | Name of app display on title bar.                                                                                                                                      |
-| **isClientApp?:** boolean    | Show `Client` text in title bar.                                                                                                                                       |
-| **appVersion:** string       | App version display on title bar.                                                                                                                                      |
-| **target:** string           | Target device type. Display below title bar.                                                                                                                           |
-| **onBuildDone?**: ConfigType | ConfigType: [{ <br>  name: string, <br>  method(): Promise<string&vert;undefined>, <br>  output?: boolean <br>}] <br><br> List of scripts running after build process. |
+| Name             | Type       | Description                                                                                                                                                            |
+|------------------|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **appName**      | string     | Name of app display on title bar.                                                                                                                                      |
+| **isClientApp?** | boolean    | Show `Client` text in title bar.                                                                                                                                       |
+| **appVersion**   | string     | App version display on title bar.                                                                                                                                      |
+| **target**       | string     | Target device type. Display below title bar.                                                                                                                           |
+| **onBuildDone?** | ConfigType | List of scripts running after build process. |
+
+```
+ConfigType: [
+  { 
+    name: string, 
+    method(): Promise<string|undefined>,
+    output?: boolean,
+  }
+]
+```
 
 
 Descriptions and visualisations
@@ -133,29 +143,28 @@ If while building process error or warning occurred plugin display all informati
 
 In plugin configuration is possibility to define list of scripts to run after build process. Each object what define script details has below options:
 
-| Name                                     | Description                                                              |
-|------------------------------------------|--------------------------------------------------------------------------|
-| name: string                             | Name of script displaying while running.                                 |
-| method(): Promise<string&vert;undefined> | Method to run script.                                                    |
-| output?: boolean                         | Option decided if plugin should display script output after done or not. |
+| Name         | Type                            | Description                                                              |
+|--------------|---------------------------------|--------------------------------------------------------------------------|
+| **name**     | string                          | Name of script displaying while running.                                 |
+| **method()** | Promise<string&vert;undefined>  | Method to run script.                                                    |
+| **output?**  | boolean                         | Option decided if plugin should display script output after done or not. |
 
 **If any script return error or warning, plugin stops rest additional scripts queue and display details.**
 
 ![](app-console-frame/7.png "Example running additional scripts")
 
 Example function for option `method`:
-  ```js
-  
-  const { exec } = require('child_process');
-  
-  function runCommand (command) {
+```js
+const { exec } = require('child_process');
+
+function runCommand (command) {
   return new Promise((resolve, reject) => {
-  exec(command, (error, stdout, stderr) => {
-  if (error) return reject(error.message);
-  if (stderr) return reject(stderr);
-  
-        resolve(stdout);
-      });
+    exec(command, (error, stdout, stderr) => {
+      if (error) return reject(error.message);
+      if (stderr) return reject(stderr);
+      
+      resolve(stdout);
+    });
   });
-  }
-  ```
+}
+```
