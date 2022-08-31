@@ -117,7 +117,7 @@ If build will be done plugin displays list of output files with extensions and s
 
 ![](app-console-frame/2.png "List of output files")
 
-If plugin is running in production mode list of output files highlights in yellow files that exceed the recommended size.
+If the plugin is in production mode, the names of files on the output list that exceed the recommended size are highlighted in yellow.
 
 ![](app-console-frame/3.png "List of output files with some over sized")
 
@@ -141,7 +141,7 @@ If while building process error or warning occurred plugin displays all informat
 
 ### Running additional scripts after build process (onBuildDone)
 
-In plugin configuration is possibility to define list of scripts to run after build process. Each object what define script details has below options:
+In the plugin configuration is possibility to define list of scripts to run after build process. Each object what define script details has below options:
 
 | Name         | Type                            | Description                                                              |
 |--------------|---------------------------------|--------------------------------------------------------------------------|
