@@ -1,13 +1,27 @@
 App Console Frame for Webpack
 ==================
 
-Purpose:
+[← Go back](../README.md)
+
+>  ### Table of content:
+>  * [Purpose](#purpose)
+>  * [What provides](#what-provides)
+>  * [Requirements for Webpack configuration](#requirements-for-webpack-configuration)
+>  * [Usage examples](#usage-examples)
+>  * [Available configuration](#available-configuration)
+>  * [Descriptions and visualisations](#descriptions-and-visualisations)
+>    + [Description of base behavior](#description-of-base-behavior)
+>    + [Option `--watch` for Webpack](#option---watch-for-webpack)
+>    + [Error and warning display handling](#error-and-warning-display-handling)
+>    + [Running additional scripts after build process (onBuildDone)](#running-additional-scripts-after-build-process-onbuilddone)
+
+Purpose
 ---------
 
 Improve quality and appearance of build information.  
 Possibility to run additional scripts after build process.
 
-What provides:
+What provides
 ---------------
 
 * Information what build kind and mode we chose.
@@ -16,7 +30,7 @@ What provides:
 * Highlight in yellow for files larger than the recommended size - only for the production version.
 * Possibility to run additional scripts after build process.
 
-Requirements for Webpack configuration:
+Requirements for Webpack configuration
 ----------------------------------------
 
 * Set `stats` parameter in Webpack config like below
@@ -32,7 +46,7 @@ Requirements for Webpack configuration:
 * Set `performance.maxAssetSize` to value `250000`
 
 
-Usage examples:
+Usage examples
 ----------------
 
 File: `client/webpack/config.common.js`
@@ -66,7 +80,7 @@ module.exports = {
 };
 ```
 
-Available configuration:
+Available configuration
 -------------------------
 
 | Name                         | Description                                                                                                                                                            |
@@ -78,7 +92,7 @@ Available configuration:
 | **onBuildDone?**: ConfigType | ConfigType: [{ <br>  name: string, <br>  method(): Promise<string&vert;undefined>, <br>  output?: boolean <br>}] <br><br> List of scripts running after build process. |
 
 
-Descriptions and visualisations:
+Descriptions and visualisations
 ----------------------------------
 
 ### Description of base behavior
