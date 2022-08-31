@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.14] – 2022-08-31
+### Updated 
+- Readme file for whole project
+### Added
+- AppConsoleFrame: Add readme for plugin 
+
 ## [0.2.13] – 2022-08-23
 ### Changed
 - AppConsoleFrame: Clear console down before each write usage
