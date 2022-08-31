@@ -83,13 +83,13 @@ module.exports = {
 Available configuration
 -------------------------
 
-| Name             | Type       | Description                                                                                                                                                            |
-|------------------|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **appName**      | string     | Name of app display on title bar.                                                                                                                                      |
-| **isClientApp?** | boolean    | Show `Client` text in title bar.                                                                                                                                       |
-| **appVersion**   | string     | App version display on title bar.                                                                                                                                      |
-| **target**       | string     | Target device type. Display below title bar.                                                                                                                           |
-| **onBuildDone?** | ConfigType | List of scripts running after build process. |
+| Name             | Type       | Description                                    |
+|------------------|------------|------------------------------------------------|
+| **appName**      | string     | Name of app display on title bar.              |
+| **isClientApp?** | boolean    | Show `Client` text in title bar.               |
+| **appVersion**   | string     | App version display on title bar.              |
+| **target**       | string     | Target device type. Display below title bar.   |
+| **onBuildDone?** | ConfigType | List of scripts running after build process.   |
 
 ```
 ConfigType: [
@@ -107,35 +107,35 @@ Descriptions and visualisations
 
 ### Description of base behavior
 
-Plugin after run clear console and display title bar with app name, type (`Client` or not) and version.  
-Below title bar plugin display build mode (dev or prod), target device (able to set custom in config e.g. `Browser`) and builder running mode (`Watch` or `Single run`).  
+After run plugin clears console and displays title bar with app name, type (`Client` or not) and version.  
+Below title bar plugin displays build mode (dev or prod), target device (able to set custom in config e.g. `Browser`) and builder running mode (`Watch` or `Single run`).  
 Two lines lower is displayed progress-bar for building process.
 
 ![](app-console-frame/1.png "Building package")
 
-If build will be done plugin display list of output files with extensions and sizes.
+If build will be done plugin displays list of output files with extensions and sizes.
 
 ![](app-console-frame/2.png "List of output files")
 
-If plugin run in production mode list of output files highlight in yellow files what are over the recommended size.
+If plugin is running in production mode list of output files highlights in yellow files that exceed the recommended size.
 
 ![](app-console-frame/3.png "List of output files with some over sized")
 
 ### Option `--watch` for Webpack
 
-Plugin detects if Webpack is running in `watch` mode or not and display information about it below of title bar.
+Plugin detects if Webpack is running in `watch` mode or not and displays information about it below of title bar.
 
-For option `--watch` it display `Watch` text below title bar and `Waiting for changes…` in last line of console - example below.
+For option `--watch` it displays `Watch` text below title bar and `Waiting for changes…` in last line of console - example below.
 
 ![](app-console-frame/4.png "Builder running in --watch mode")
 
-If option `watch` is not used plugin display `Single run` text - example below:
+If option `watch` is not used plugin displays `Single run` text - example below:
 
 ![](app-console-frame/5.png "Builder running in single run mode")
 
 ### Error and warning display handling
 
-If while building process error or warning occurred plugin display all information below of progress bar. Rest information (list of output files etc.) won't be display until all errors and warinings will be removed.
+If while building process error or warning occurred plugin displays all information below of progress bar. Rest information (list of output files etc.) won't be display until all errors and warnings will be removed.
 
 ![](app-console-frame/6.png "Example error while build process")
 
@@ -149,7 +149,7 @@ In plugin configuration is possibility to define list of scripts to run after bu
 | **method()** | Promise<string&vert;undefined>  | Method to run script.                                                    |
 | **output?**  | boolean                         | Option decided if plugin should display script output after done or not. |
 
-**If any script return error or warning, plugin stops rest additional scripts queue and display details.**
+**If any script return error or warning, plugin stops rest additional scripts queue and displays details.**
 
 ![](app-console-frame/7.png "Example running additional scripts")
 
