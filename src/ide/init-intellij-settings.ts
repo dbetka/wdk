@@ -15,7 +15,8 @@ export async function initIntellijSettings(modifiers:SingleModifier[]) {
   try {
     shell.clear();
     shell.newLine();
-    shell.write(chalk.bold('Initialize Intellij configuration\n'));
+    shell.write(chalk.bold('Initialize Intellij Settings'));
+    shell.newLine();
 
     for (const modifierConfig of modifiers) {
       shell.newLine()
@@ -28,7 +29,12 @@ export async function initIntellijSettings(modifiers:SingleModifier[]) {
     shell.write(chalk.bold.green('  All done!'));
   }
   catch (err) {
+    shell.tab(2)
+    shell.write(chalk.bold.red('failed'))
+    shell.newLine();
+    shell.tab(2)
     shell.error(err);
+    shell.newLine();
     process.exit(1);
   }
 }
