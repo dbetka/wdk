@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] – 2022-09-19
+### Added
+- Create InitIntellijSettings lib and docs for it
+
 ## [0.2.14] – 2022-08-31
 ### Updated 
 - Readme file for whole project
