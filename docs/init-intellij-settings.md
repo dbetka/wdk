@@ -1,4 +1,4 @@
-App Console Frame for Webpack
+Init Intellij Settings
 ==================
 
 [← Go back](../README.md)
