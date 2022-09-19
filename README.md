@@ -12,3 +12,9 @@ Webpack utils
 --------------
 
 * [App Console Frame](docs/app-console-frame.md)
+
+
+IDE utils
+--------------
+
+* [Init Intellij Settings](docs/init-intellij-settings.md)
