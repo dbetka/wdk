@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] – 2022-09-19
+### Fixed
+- Dependencies tree – move xml2js and chalk to dependencies
+
 ## [0.3.0] – 2022-09-19
 ### Added
 - Create InitIntellijSettings lib and docs for it
