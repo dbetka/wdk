@@ -7,21 +7,37 @@ export interface SingleModifier {
   name: string
   defaultXMLPath: string
   targetXMLPath: string
-  validator(json:[]|object): boolean
-  modifier(json:[]|object): string
+  validator(parsedJson:any): boolean
+  modifier(parsedJson:any): string
+  replaceIfExists: false
+}
+export interface SingleReplacer {
+  name: string
+  defaultXMLPath: string
+  targetXMLPath: string
+  replaceIfExists: true
 }
 
-export async function initIntellijSettings(modifiers:SingleModifier[]) {
+export type SingleModifierOrReplacer = SingleModifier|SingleReplacer
+export type ListOfModifiersOrReplacers = SingleModifierOrReplacer[]
+
+export async function initIntellijSettings(modifiersOrReplacers:ListOfModifiersOrReplacers) {
   try {
     shell.clear();
     shell.newLine();
     shell.write(chalk.bold('Initialize Intellij Settings'));
     shell.newLine();
 
-    for (const modifierConfig of modifiers) {
+    for (const config of modifiersOrReplacers) {
       shell.newLine()
-      shell.write('  ' + modifierConfig.name)
-      await modifyXMLSettings(modifierConfig)
+      shell.write('  ' + config.name)
+
+      config.replaceIfExists
+        ? await replaceXMLSettings(config as SingleReplacer)
+        : await modifyXMLSettings(config as SingleModifier)
+
+      shell.write(chalk.green.bold('    done '));
+      shell.write(chalk.green(config.targetXMLPath));
     }
 
     shell.newLine();
@@ -39,29 +55,28 @@ export async function initIntellijSettings(modifiers:SingleModifier[]) {
   }
 }
 
+async function replaceXMLSettings (config:SingleReplacer) {
+  const { targetXMLPath } = config
+  const { defaultXMLString, targetXMLExists } = prepareForChangingSettings(config)
+
+  if (targetXMLExists)
+    fs.rmSync(targetXMLPath)
+
+  fs.writeFileSync(targetXMLPath, defaultXMLString);
+}
+
 async function modifyXMLSettings (config:SingleModifier) {
-  const {
-    defaultXMLPath,
-    targetXMLPath,
-    validator,
-    modifier,
-  } = config
+  const { targetXMLPath, validator, modifier } = config
+  const { defaultXMLString, targetXMLNotExists } = prepareForChangingSettings(config)
 
-  if (fs.existsSync(defaultXMLPath) === false) throw new Error(`File "${defaultXMLPath}" must exists.`);
-
-  const defaultXMLString = fs.readFileSync(defaultXMLPath, 'utf-8');
-  const targetXMLExists = fs.existsSync(targetXMLPath);
-  const dirnameTarget = path.dirname(targetXMLPath);
-
-  if (targetXMLExists === false) {
-    fs.existsSync(dirnameTarget) === false && fs.mkdirSync(dirnameTarget, { recursive: true });
+  if (targetXMLNotExists)
     fs.writeFileSync(targetXMLPath, defaultXMLString);
-  }
+
   else {
     const targetXML = fs.readFileSync(targetXMLPath, 'utf-8');
 
     const targetJSON = await xml2js.parseStringPromise(targetXML);
-    if (targetJSON === null || validator(targetJSON)) throw new Error(`File "${targetXMLPath}" has invalid structure or is corrupted.`);
+    if (targetJSON === null || !validator(targetJSON)) throw new Error(`File "${targetXMLPath}" has invalid structure or is corrupted.`);
 
     const modifiedTargetJSON = modifier(targetJSON);
 
@@ -70,9 +85,27 @@ async function modifyXMLSettings (config:SingleModifier) {
 
     fs.writeFileSync(targetXMLPath, newTargetXML);
   }
+}
 
-  shell.write(chalk.green.bold('    done '));
-  shell.write(chalk.green(targetXMLPath));
+function prepareForChangingSettings (config:SingleModifierOrReplacer) {
+  const { defaultXMLPath, targetXMLPath } = config
+
+  if (!fs.existsSync(defaultXMLPath)) throw new Error(`File "${defaultXMLPath}" must exists.`);
+
+  const targetXMLExists = fs.existsSync(targetXMLPath);
+  const targetXMLNotExists = !targetXMLExists;
+  const defaultXMLString = fs.readFileSync(defaultXMLPath, 'utf-8');
+  const dirnameTargetPath = path.dirname(targetXMLPath);
+  const dirnameTargetExists = fs.existsSync(dirnameTargetPath);
+  const dirnameTargetNotExists = !dirnameTargetExists;
+
+  dirnameTargetNotExists && fs.mkdirSync(dirnameTargetPath, { recursive: true });
+
+  return {
+    defaultXMLString,
+    targetXMLExists,
+    targetXMLNotExists,
+  }
 }
 
 const shell = {
