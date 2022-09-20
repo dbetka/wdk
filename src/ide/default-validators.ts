@@ -1,6 +1,4 @@
-import {XMLUtils} from "./xml-utils";
-
-const getByName = XMLUtils.getByName
+import { getByName } from "./xml-utils";
 
 export const defaultValidators = {
   projectDefaultEslint: () => (json:any) => {

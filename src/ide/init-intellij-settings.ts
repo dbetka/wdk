@@ -7,7 +7,7 @@ export interface SingleCommonConfig {
   name: string
   defaultXMLPath: string
   targetXMLPath: string
-  replaceIfTargetInvalid?: boolean
+  replaceIfInvalid?: boolean
 }
 
 export interface SingleModifier extends SingleCommonConfig {
@@ -95,7 +95,7 @@ async function modifyXMLSettings (config:SingleModifier) {
     }
   }
   catch (err) {
-    if (config.replaceIfTargetInvalid === true)
+    if (config.replaceIfInvalid === true)
       await replaceXMLSettings(config)
     else
       throw err
