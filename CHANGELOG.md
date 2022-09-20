@@ -6,10 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Add possible to replace target file if exists 
-- Add possible to replace target file if it has unexpected structure, or it's corrupted
+- IDE: Add possible to replace target file if exists 
+- IDE: Add possible to replace target file if it has unexpected structure, or it's corrupted
 ### Fixed
-- Fix validator condition
+- IDE: Fix validator condition
 
 ## [0.3.2] – 2022-09-20
 ### Fixed
