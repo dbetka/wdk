@@ -7,8 +7,8 @@ export interface SingleModifier {
   name: string
   defaultXMLPath: string
   targetXMLPath: string
-  validator(json:string): boolean
-  modifier(json:string): string
+  validator(json:[]|object): boolean
+  modifier(json:[]|object): string
 }
 
 export async function initIntellijSettings(modifiers:SingleModifier[]) {
