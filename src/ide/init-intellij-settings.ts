@@ -7,8 +7,8 @@ export interface SingleModifier {
   name: string
   defaultXMLPath: string
   targetXMLPath: string
-  validator(json:string): boolean
-  modifier(json:string): string
+  validator(json:[]|object): boolean
+  modifier(json:[]|object): string
 }
 
 export async function initIntellijSettings(modifiers:SingleModifier[]) {
@@ -33,7 +33,7 @@ export async function initIntellijSettings(modifiers:SingleModifier[]) {
     shell.write(chalk.bold.red('failed'))
     shell.newLine();
     shell.tab(2)
-    shell.error(err);
+    shell.error(err as Error);
     shell.newLine();
     process.exit(1);
   }
@@ -61,7 +61,7 @@ async function modifyXMLSettings (config:SingleModifier) {
     const targetXML = fs.readFileSync(targetXMLPath, 'utf-8');
 
     const targetJSON = await xml2js.parseStringPromise(targetXML);
-    if (validator(targetJSON)) throw new Error(`File "${targetXMLPath}" has invalid structure or is corrupted.`);
+    if (targetJSON === null || validator(targetJSON)) throw new Error(`File "${targetXMLPath}" has invalid structure or is corrupted.`);
 
     const modifiedTargetJSON = modifier(targetJSON);
 
@@ -76,7 +76,7 @@ async function modifyXMLSettings (config:SingleModifier) {
 }
 
 const shell = {
-  error: (err:unknown) => process.stderr.write(chalk.red(err)),
+  error: (err:Error) => process.stderr.write(chalk.red(err.stack)),
   clear: () => process.stdout.write('\x1Bc'),
   write: (text:string) => process.stdout.write(text),
   newLine: (count:number = 1) => process.stdout.write('\n'.repeat(count)),
