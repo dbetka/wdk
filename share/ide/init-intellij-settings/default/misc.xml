@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project version="4">
+  <component name="WebPackConfiguration">
+    <option name="mode" value="MANUAL"/>
+    <option name="path" value="$PROJECT_DIR$/client/webpack/config.common.js"/>
+  </component>
+</project>
