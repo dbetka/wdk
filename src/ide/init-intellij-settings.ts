@@ -3,18 +3,19 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 
-export interface SingleModifier {
+export interface SingleCommonConfig {
   name: string
   defaultXMLPath: string
   targetXMLPath: string
+  replaceIfTargetInvalid?: boolean
+}
+
+export interface SingleModifier extends SingleCommonConfig {
   validator(parsedJson:any): boolean
   modifier(parsedJson:any): string
   replaceIfExists: false
 }
-export interface SingleReplacer {
-  name: string
-  defaultXMLPath: string
-  targetXMLPath: string
+export interface SingleReplacer extends SingleCommonConfig{
   replaceIfExists: true
 }
 
@@ -36,7 +37,6 @@ export async function initIntellijSettings(modifiersOrReplacers:ListOfModifiersO
         ? await replaceXMLSettings(config as SingleReplacer)
         : await modifyXMLSettings(config as SingleModifier)
 
-      shell.write(chalk.green.bold('    done '));
       shell.write(chalk.green(config.targetXMLPath));
     }
 
@@ -55,7 +55,7 @@ export async function initIntellijSettings(modifiersOrReplacers:ListOfModifiersO
   }
 }
 
-async function replaceXMLSettings (config:SingleReplacer) {
+async function replaceXMLSettings (config:SingleModifierOrReplacer) {
   const { targetXMLPath } = config
   const { defaultXMLString, targetXMLExists } = prepareForChangingSettings(config)
 
@@ -63,27 +63,42 @@ async function replaceXMLSettings (config:SingleReplacer) {
     fs.rmSync(targetXMLPath)
 
   fs.writeFileSync(targetXMLPath, defaultXMLString);
+
+  targetXMLExists
+    ? shell.write(chalk.green.bold('    replaced '))
+    : shell.write(chalk.green.bold('    created '));
 }
 
 async function modifyXMLSettings (config:SingleModifier) {
   const { targetXMLPath, validator, modifier } = config
   const { defaultXMLString, targetXMLNotExists } = prepareForChangingSettings(config)
 
-  if (targetXMLNotExists)
-    fs.writeFileSync(targetXMLPath, defaultXMLString);
+  try {
+    if (targetXMLNotExists) {
+      fs.writeFileSync(targetXMLPath, defaultXMLString);
+      shell.write(chalk.green.bold('    created '));
+    }
+    else {
+      const targetXML = fs.readFileSync(targetXMLPath, 'utf-8');
+      const targetJSON = await xml2js.parseStringPromise(targetXML);
 
-  else {
-    const targetXML = fs.readFileSync(targetXMLPath, 'utf-8');
+      if (targetJSON === null || !validator(targetJSON))
+        throw new Error(`File "${targetXMLPath}" has unexpected structure or it's corrupted.`);
 
-    const targetJSON = await xml2js.parseStringPromise(targetXML);
-    if (targetJSON === null || !validator(targetJSON)) throw new Error(`File "${targetXMLPath}" has invalid structure or is corrupted.`);
+      const modifiedTargetJSON = modifier(targetJSON);
 
-    const modifiedTargetJSON = modifier(targetJSON);
+      const builder = new xml2js.Builder();
+      const newTargetXML = builder.buildObject(modifiedTargetJSON);
 
-    const builder = new xml2js.Builder();
-    const newTargetXML = builder.buildObject(modifiedTargetJSON);
-
-    fs.writeFileSync(targetXMLPath, newTargetXML);
+      fs.writeFileSync(targetXMLPath, newTargetXML);
+      shell.write(chalk.green.bold('    modified '));
+    }
+  }
+  catch (err) {
+    if (config.replaceIfTargetInvalid === true)
+      await replaceXMLSettings(config)
+    else
+      throw err
   }
 }
 

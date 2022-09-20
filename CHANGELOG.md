@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Add possible to replace target file if exists 
+- Add possible to replace target file if it has unexpected structure, or it's corrupted
 ### Fixed
 - Fix validator condition
 
