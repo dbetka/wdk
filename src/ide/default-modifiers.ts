@@ -1,8 +1,4 @@
-import {XMLUtils} from "./xml-utils";
-
-const modifyAttr = XMLUtils.modifyAttr
-const getByName = XMLUtils.getByName
-const modifyValueByName = XMLUtils.modifyValueByName
+import { getByName, modifyAttr, modifyValueByName } from "./xml-utils";
 
 export interface ProjectDefaultEslintAttrs {
   classAttr?: string
