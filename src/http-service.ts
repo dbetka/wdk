@@ -42,7 +42,7 @@ export class HttpService<ErrorOptions, ServerError> {
   private handleRequest<In, Out> (options: HttpConfig<In, Out, ErrorOptions>): Promise<Out> {
     const { url, requestConfig, successCallback = null, errorOptions } = this.prepareRequestData(options);
     return new Promise<Out>((resolve, reject) => {
-      const fetchMethod = this.config?.fetchProxy || fetch
+      const fetchMethod = this.config?.fetchProxy || fetch;
 
       fetchMethod(url, {
         ...this.config!.defaultRequestConfig,

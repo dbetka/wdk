@@ -1,4 +1,4 @@
-export type SuccessFunction<In, Out> = (data: In) => Out
+export type SuccessFunction<In, Out> = (data: In) => Out;
 export type ErrorFunction<ErrorOptions, ServerError> = (error: ServerError, options: ErrorOptions) => number | Error | void | string;
 
 export interface HttpServiceConfig<ErrorOptions, ServerError> {
@@ -13,14 +13,14 @@ export interface HttpServiceConfig<ErrorOptions, ServerError> {
 
 export interface HttpBaseConfig<In, Out, ErrorOptions> {
   url: string;
-  errorOptions: ErrorOptions
+  errorOptions: ErrorOptions;
   requestConfig?: RequestInit;
-  successCallback?: SuccessFunction<In, Out>
+  successCallback?: SuccessFunction<In, Out>;
 }
 
 export interface HttpQueryConfig<In, Out, ErrorOptions>
     extends HttpBaseConfig<In, Out, ErrorOptions> {
-  queryObject?: {[key:string]: string | number}
+  queryObject?: {[key:string]: string | number};
 }
 
 export interface HttpCommandConfig<In, Out, ErrorOptions>
@@ -30,5 +30,5 @@ export interface HttpCommandConfig<In, Out, ErrorOptions>
 
 export interface HttpConfig<In, Out, ErrorOptions>
     extends HttpCommandConfig<In, Out, ErrorOptions> {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
 }

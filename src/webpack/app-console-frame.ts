@@ -1,40 +1,40 @@
-import * as chalk from 'chalk'
-import * as dayjs from 'dayjs'
-import { Table } from 'console-table-printer'
-import { progressBarPlugin } from './progress-bar'
+import * as chalk from 'chalk';
+import * as dayjs from 'dayjs';
+import { Table } from 'console-table-printer';
+import { progressBarPlugin } from './progress-bar';
 import type {ProgressBarPluginType} from './progress-bar';
-import * as duration from 'dayjs/plugin/duration'
-import type { Compiler, WebpackOptionsNormalized, Stats } from 'webpack'
+import * as duration from 'dayjs/plugin/duration';
+import type { Compiler, WebpackOptionsNormalized, Stats } from 'webpack';
 
 dayjs.extend(duration);
 
 declare interface AppConsoleFramePluginConfigType {
-  appName: string
-  isClientApp?: boolean
-  appVersion: string
-  target: string
+  appName: string;
+  isClientApp?: boolean;
+  appVersion: string;
+  target: string;
   onBuildDone?: [
     {
       name: string
       method(): Promise<string|undefined>
       output?: boolean
     }
-  ]
+  ];
 }
 
 export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
-  const progressBar = progressBarPlugin()
-  const mainPlugin = new AppConsoleFramePlugin(config, progressBar)
+  const progressBar = progressBarPlugin();
+  const mainPlugin = new AppConsoleFramePlugin(config, progressBar);
 
   return [
     mainPlugin,
     progressBar.plugin,
-  ]
+  ];
 }
 
 class AppConsoleFramePlugin {
-  config: AppConsoleFramePluginConfigType
-  progressBar: ProgressBarPluginType
+  config: AppConsoleFramePluginConfigType;
+  progressBar: ProgressBarPluginType;
 
   constructor (config: AppConsoleFramePluginConfigType, progressBar: ProgressBarPluginType) {
     this.config = config;
@@ -44,7 +44,7 @@ class AppConsoleFramePlugin {
   apply (compiler: Compiler) {
     const pluginName = AppConsoleFramePlugin.name;
     const { appName, isClientApp = true, appVersion, target } = this.config;
-    const clientText = isClientApp ? ' Client' : ''
+    const clientText = isClientApp ? ' Client' : '';
     const mode = this.capitalizeFirstChar(compiler.options.mode ? compiler.options.mode : '');
     const targetText = this.capitalizeFirstChar(target);
     const watch = this.capitalizeFirstChar(compiler.options.watch ? 'watch' : 'single run');
@@ -93,10 +93,10 @@ class AppConsoleFramePlugin {
               this.runAdditionalActivities()
                 .then(() => {
                   if (compiler.options.watch) {
-                    this.newLine()
+                    this.newLine();
                     this.write('  Waiting for changes...');
                   }
-                })
+                });
           });
         }, 200);
       },
@@ -104,8 +104,8 @@ class AppConsoleFramePlugin {
   }
 
   async runAdditionalActivities () {
-    const onBuildDone = this.config.onBuildDone
-    const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0
+    const onBuildDone = this.config.onBuildDone;
+    const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0;
 
     if (onBuildDoneDefined) {
       this.write(chalk.bold(`  Additional activities:`));
@@ -115,20 +115,20 @@ class AppConsoleFramePlugin {
         try {
           this.write(`  - ${activity.name}`);
           const activityOutput = await activity.method();
-          this.write(chalk.green.bold(`    Done!`))
-          this.newLine()
-          if (activity.output && activityOutput) this.write(activityOutput)
+          this.write(chalk.green.bold(`    Done!`));
+          this.newLine();
+          if (activity.output && activityOutput) this.write(activityOutput);
 
         } catch (error) {
-          this.write(chalk.red.bold(`    Failed!`))
-          this.newLine(2)
-          this.write(String(error))
-          process.exit(1)
+          this.write(chalk.red.bold(`    Failed!`));
+          this.newLine(2);
+          this.write(String(error));
+          process.exit(1);
         }
       }
     }
 
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   capitalizeFirstChar (text: string) {
@@ -151,7 +151,7 @@ class AppConsoleFramePlugin {
     const availableExt = ['js'];
     const isProductionMode = stats.compilation.compiler.options.mode === 'production';
     const performance = (stats.compilation.compiler.options as WebpackOptionsNormalized).performance || {};
-    let maxAssetSize = 0
+    let maxAssetSize = 0;
     if ('maxAssetSize' in performance) {
       maxAssetSize = performance?.maxAssetSize || 0;
     }
@@ -183,28 +183,28 @@ class AppConsoleFramePlugin {
   }
 
   clearLine () {
-    process.stdout.clearLine(0)
+    process.stdout.clearLine(0);
   }
 
   clearRight () {
-    process.stdout.clearLine(1)
+    process.stdout.clearLine(1);
   }
 
   clearDown () {
-    process.stdout.clearScreenDown()
+    process.stdout.clearScreenDown();
   }
 
   newLine (numberOfNewLines = 1) {
     for (let i = 0; i < numberOfNewLines; ++i) {
-      process.stdout.write('\n')
-      this.clearLine()
-      this.clearDown()
+      process.stdout.write('\n');
+      this.clearLine();
+      this.clearDown();
     }
   }
 
   write (text: string) {
-    this.clearRight()
-    this.clearDown()
+    this.clearRight();
+    this.clearDown();
     process.stdout.write(text);
   }
 

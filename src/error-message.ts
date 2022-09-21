@@ -17,7 +17,7 @@ export class ErrorMessage extends Error {
     }
     if(!config && !ErrorMessage.config) {
       // tslint:disable-next-line:no-console
-      console.warn('Please provide config for ErrorMessage class')
+      console.warn('Please provide config for ErrorMessage class');
     }
     this.hard = ErrorMessage.config.hard;
     this.communicates = ErrorMessage.config.communicates;

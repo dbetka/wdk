@@ -4,7 +4,7 @@ export const arrayUtils = {
     if (indexToRemove !== -1) {
       return array.splice(indexToRemove, 1);
     }
-    return []
+    return [];
   },
   removeItemByIndex<T>(array: T[], indexToRemove: number): T[] {
     return array.splice(indexToRemove, 1);

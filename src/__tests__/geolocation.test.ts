@@ -24,63 +24,63 @@ const helpers = {
     code: 0,
     message: ""
 }
-}
-const positionChanged = () => helpers.subs.map(sub => sub.callback())
+};
+const positionChanged = () => helpers.subs.map(sub => sub.callback());
 
 const geolocationMock : Geolocation = {
     clearWatch(watchId: number): void {
-        const el = helpers.subs.find(el => el.watchId === watchId)
+        const el = helpers.subs.find(el => el.watchId === watchId);
         arrayUtils.removeItem(helpers.subs, el);
     },
     getCurrentPosition(successCallback: PositionCallback, errorCallback: PositionErrorCallback, options: PositionOptions): void {
         if(helpers.isPositive) {
-            successCallback(helpers.posResponse)
+            successCallback(helpers.posResponse);
         } else {
-            errorCallback(helpers.posErrResponse)
+            errorCallback(helpers.posErrResponse);
         }
     },
     watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback, options?: PositionOptions): number {
-        helpers.subs.push({watchId: helpers.subsCounter, callback: successCallback})
+        helpers.subs.push({watchId: helpers.subsCounter, callback: successCallback});
         return helpers.subsCounter++;
     }
-}
-const defaultSuccessCallback = jest.fn()
-const defaultErrorCallback = jest.fn()
-const errorCallback = jest.fn()
-const successCallback = jest.fn()
+};
+const defaultSuccessCallback = jest.fn();
+const defaultErrorCallback = jest.fn();
+const errorCallback = jest.fn();
+const successCallback = jest.fn();
 const geolocationApi =  new GeolocationService({
     defaultErrorCallback,
     defaultSuccessCallback
-})
-geolocationApi.nativeApi = geolocationMock
+});
+geolocationApi.nativeApi = geolocationMock;
 
 describe('geolocationServices', () => {
     beforeEach(() => {
         helpers.isPositive = true;
-        helpers.subsCounter = 0
-        helpers.subs = []
-        jest.clearAllMocks()
-    })
+        helpers.subsCounter = 0;
+        helpers.subs = [];
+        jest.clearAllMocks();
+    });
     describe('getCurrentPosition', () => {
         it('use default success callback with default options', () => {
             geolocationApi.getCurrentPosition();
             expect(defaultSuccessCallback.mock.calls.length).toBe(1);
-        })
+        });
         it('use default error callback', () => {
             helpers.isPositive = false;
             geolocationApi.getCurrentPosition();
             expect(defaultErrorCallback.mock.calls.length).toBe(1);
-        })
+        });
         it('use custom success callback', () => {
             geolocationApi.getCurrentPosition(successCallback);
             expect(successCallback.mock.calls.length).toBe(1);
-        })
+        });
         it('use custom error callback', () => {
             helpers.isPositive = false;
             geolocationApi.getCurrentPosition(successCallback, errorCallback);
             expect(errorCallback.mock.calls.length).toBe(1);
-        })
-    })
+        });
+    });
 
     describe('subscribe', () => {
         it('trigger default success callback on event', () => {
@@ -88,46 +88,46 @@ describe('geolocationServices', () => {
             positionChanged();
             positionChanged();
             expect(defaultSuccessCallback.mock.calls.length).toBe(2);
-        })
+        });
         it('unsubsribe works', () => {
             const sub = geolocationApi.subscribe();
             positionChanged();
-            sub.unsubscribe()
-            positionChanged()
+            sub.unsubscribe();
+            positionChanged();
             expect(defaultSuccessCallback.mock.calls.length).toBe(1);
-        })
+        });
         it('unsubsribe works', () => {
             const sub1 = geolocationApi.subscribe();
             const sub2 = geolocationApi.subscribe();
             positionChanged();
             positionChanged();
             geolocationApi.unsubscribeAll();
-            positionChanged()
+            positionChanged();
             expect(defaultSuccessCallback.mock.calls.length).toBe(4);
-        })
-    })
+        });
+    });
     describe('promise based', () => {
         it('getCurrentPositionMock success', () => {
             expect.assertions(1);
             return geolocationApi.getCurrentPositionPromise()
-                .then(pos => expect(pos).toBe(helpers.posResponse))
-        })
+                .then(pos => expect(pos).toBe(helpers.posResponse));
+        });
         it('getCurrentPositionMock failure', () => {
             expect.assertions(1);
-            helpers.isPositive = false
+            helpers.isPositive = false;
             return geolocationApi.getCurrentPositionPromise()
-                .catch(err => expect(err).toBe(helpers.posErrResponse))
-        })
+                .catch(err => expect(err).toBe(helpers.posErrResponse));
+        });
         it('isEnabled success', () => {
             expect.assertions(1);
             return geolocationApi.isEnabled()
-                .then(result => expect(result).toBe(true))
-        })
+                .then(result => expect(result).toBe(true));
+        });
         it('isEnabled false', () => {
             expect.assertions(1);
-            helpers.isPositive = false
+            helpers.isPositive = false;
             return geolocationApi.isEnabled()
-                .then(result => expect(result).toBe(false))
-        })
+                .then(result => expect(result).toBe(false));
+        });
     });
-})
+});
