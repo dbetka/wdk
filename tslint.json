@@ -3,5 +3,6 @@
   "rules": {
     "no-unused-expression": false,
     "semicolon": true
-  }
+  },
+  "fix": true
 }

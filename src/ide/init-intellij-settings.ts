@@ -2,6 +2,18 @@ import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
+import { shell as defaultShell } from '../helpers/shell';
+
+const shell = {
+  ...defaultShell,
+  writeSuccess: (message:string) => shell.tab(2) && shell.write(chalk.green.bold(message + ' ')),
+  success: {
+    created: () => shell.writeSuccess('created'),
+    modified: () => shell.writeSuccess('modified'),
+    replaced: () => shell.writeSuccess('replaced'),
+    merged: () => shell.writeSuccess('merged'),
+  }
+};
 
 export interface SingleCommonConfig {
   name: string;
@@ -125,18 +137,3 @@ function prepareForChangingSettings (config:SingleModifierOrReplacer) {
     targetXMLNotExists,
   };
 }
-
-const shell = {
-  error: (err:Error) => process.stderr.write(chalk.red(err.stack)),
-  clear: () => process.stdout.write('\x1Bc'),
-  write: (text:string) => process.stdout.write(text),
-  newLine: (count:number = 1) => process.stdout.write('\n'.repeat(count)),
-  tab: (count:number = 1) => process.stdout.write('  '.repeat(count)),
-  writeSuccess: (message:string) => shell.tab(2) && shell.write(chalk.green.bold(message + ' ')),
-  success: {
-    created: () => shell.writeSuccess('created'),
-    modified: () => shell.writeSuccess('modified'),
-    replaced: () => shell.writeSuccess('replaced'),
-    merged: () => shell.writeSuccess('merged'),
-  }
-};
