@@ -49,7 +49,7 @@ export async function initIntellijSettings(modifiersOrReplacers:ListOfModifiersO
 
       config.replaceIfExists
         ? await replaceXMLSettings(config as SingleReplacer)
-        : await modifyXMLSettings(config as SingleModifier)
+        : await modifyXMLSettings(config as SingleModifier);
 
       shell.write(chalk.green(config.targetXMLPath));
     }
