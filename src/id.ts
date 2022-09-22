@@ -2,7 +2,7 @@ import { generateRandomStringWithoutSimilarChars } from './random';
 
 interface IdUtilsConfig {
   idLength: number;
-  generatedIdValidator: (id: string) => boolean
+  generatedIdValidator: (id: string) => boolean;
 }
 
 export const idUtils = (config: IdUtilsConfig) => ({

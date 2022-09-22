@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] – 2022-09-22
+### Updated
+- Refactor console messages
+- Make semicolon required in tslint rules
+- Separate shell to helpers
+### Added
+- CLI for export-intellij-settings
+- Lint before each build
+- Default values for cli params in export-intellij-settings
+### Fixed
+- Correct tsconfig
+- Correct path for codeStyleConfig
+
 ## [0.4.0] – 2022-09-20
 ### Updated
 - IDE: Docs for init-intellij-settings

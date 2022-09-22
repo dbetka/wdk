@@ -1,10 +1,10 @@
 import { getByName, modifyAttr, modifyValueByName } from "./xml-utils";
 
 export interface ProjectDefaultEslintAttrs {
-  classAttr?: string
-  enabled?: string
-  level?: string
-  enabledByDefault?: string
+  classAttr?: string;
+  enabled?: string;
+  level?: string;
+  enabledByDefault?: string;
 }
 
 export const defaultModifiers = {
@@ -14,7 +14,7 @@ export const defaultModifiers = {
       enabled = 'true',
       level = 'WARNING',
       enabledByDefault = 'true',
-    } = attrs
+    } = attrs;
 
     const profile = json.component.profile[0];
     const inspectionTool = profile.inspection_tool[0];
@@ -39,4 +39,4 @@ export const defaultModifiers = {
 
     return json;
   },
-}
+};

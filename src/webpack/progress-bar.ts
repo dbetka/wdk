@@ -1,25 +1,25 @@
-import * as chalk from 'chalk'
-import * as ProgressBar from 'progress'
-import * as webpack from 'webpack'
+import * as chalk from 'chalk';
+import * as ProgressBar from 'progress';
+import * as webpack from 'webpack';
 
 declare interface ProgressBarPluginOptionsType {
-  format?: string,
-  renderThrottle: number,
-  total?: number,
-  width: number,
-  complete: string,
-  incomplete: string,
-  stream: typeof process.stdout,
-  clear: boolean,
-  summary?: boolean,
-  summaryContent?: string,
-  customSummary?(buildTime?:string): void,
+  format?: string;
+  renderThrottle: number;
+  total?: number;
+  width: number;
+  complete: string;
+  incomplete: string;
+  stream: typeof process.stdout;
+  clear: boolean;
+  summary?: boolean;
+  summaryContent?: string;
+  customSummary?(buildTime?:string): void;
 }
 
 export declare interface ProgressBarPluginType {
-  plugin: webpack.ProgressPlugin | undefined
-  stop(): void
-  start(): void
+  plugin: webpack.ProgressPlugin | undefined;
+  stop(): void;
+  start(): void;
 }
 
 export function progressBarPlugin (): ProgressBarPluginType {
@@ -44,7 +44,7 @@ export function progressBarPlugin (): ProgressBarPluginType {
       plugin: undefined,
       stop: () => undefined,
       start: () => undefined,
-    }
+    };
   }
 
   const barLeft = chalk.bold('[');

@@ -18,4 +18,4 @@ export const defaultValidators = {
     json.project !== undefined
     && json.project.component !== undefined
     && Array.isArray(getByName(json.project.component, 'WebPackConfiguration').option)
-}
+};
