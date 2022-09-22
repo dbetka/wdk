@@ -6,13 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.0-beta] – 2022-09-22
+## [0.5.0-beta1] – 2022-09-22
 ### Updated
 - Refactor console messages
 - Make semicolon required in tslint rules
 - Separate shell to helpers
 ### Added
-- Add cli for export-intellij-settings
+- CLI for WDK
+- CLI for export-intellij-settings
 ### Fixed
 - Correct tsconfig
 

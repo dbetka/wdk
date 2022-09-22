@@ -4,6 +4,7 @@
   "description": "Web Development Kit for dbetka projects",
   "license": "MIT",
   "bin": {
+    "cli": "./lib/cli.js",
     "export-intellij-settings": "./lib/ide/export-intellij-settings.js"
   },
   "scripts": {
