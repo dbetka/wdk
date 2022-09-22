@@ -49,7 +49,7 @@ export function exportSpecific (config:ExportIntellijSettingsConfig) {
 
 // ----- CLI FUNCTIONALITY -----
 
-if (process.argv && path.basename(process.argv[1]) === libName + '.js') {
+if (process.argv && [libName, libName + '.js'].includes(path.basename(process.argv[1]))) {
   const methodName = process.argv[2] as string;
 
   switch (methodName) {
