@@ -16,7 +16,7 @@ const methods = {
 };
 const srcMap = {
   [methods.codeStyleScheme]: './.idea/codeStyles/Project.xml',
-  [methods.codeStyleConfig]: './.idea/codeStyles/Project.xml',
+  [methods.codeStyleConfig]: './.idea/codeStyles/codeStyleConfig.xml',
   [methods.webpack]: './.idea/misc.xml',
   [methods.eslint]: './.idea/inspectionProfiles/Project_Default.xml',
   [methods.eslintOnSave]: './.idea/jsLinters/eslint.xml',
@@ -50,15 +50,17 @@ export function exportSpecific (config:ExportIntellijSettingsConfig) {
 // ----- CLI FUNCTIONALITY -----
 
 if (process.argv && [libName, libName + '.js'].includes(path.basename(process.argv[1]))) {
-  const methodName = process.argv[2] as string;
+  const param1 = process.argv[3] ?? '';
+  const param2 = process.argv[4] ?? '';
+  const methodName = process.argv[2] ?? '';
 
   switch (methodName) {
-    case methods.specific: exportSpecific({ src: process.argv[3], dest: process.argv[4] }); break;
-    case methods.codeStyleScheme: exportCodeStyleScheme(process.argv[3]); break;
-    case methods.codeStyleConfig: exportCodeStyleConfig(process.argv[3]); break;
-    case methods.webpack: exportWebpack(process.argv[3]); break;
-    case methods.eslint: exportESLint(process.argv[3]); break;
-    case methods.eslintOnSave: exportESLintOnSave(process.argv[3]); break;
+    case methods.specific: exportSpecific({ src: param1, dest: param2 }); break;
+    case methods.codeStyleScheme: exportCodeStyleScheme(param1); break;
+    case methods.codeStyleConfig: exportCodeStyleConfig(param1); break;
+    case methods.webpack: exportWebpack(param1); break;
+    case methods.eslint: exportESLint(param1); break;
+    case methods.eslintOnSave: exportESLintOnSave(param1); break;
     default: displayHelp();
   }
 }
