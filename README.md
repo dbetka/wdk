@@ -18,3 +18,4 @@ IDE utils
 --------------
 
 * [Init Intellij Settings](docs/init-intellij-settings.md)
+* [Export Intellij Settings](docs/export-intellij-settings.md)
