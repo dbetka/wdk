@@ -15,7 +15,7 @@ Init Intellij Settings
 Purpose
 ---------
 
-Automate initialization project settings process for new instances or new developers.
+Automate initialization project settings process for new instances of project or new developers.
 
 What provides
 ---------------
@@ -30,19 +30,18 @@ Usage examples
 ```js
 const { initIntellijSettings } = require('@dbetka/wdk/lib/ide/init-intellij-settings');
 const { getByName, modifyValueByName } = require('@dbetka/wdk/lib/ide/xml-utils');
-const { defaultValidators } = require('@dbetka/wdk/lib/ide/default-validators');
-const { defaultModifiers } = require('@dbetka/wdk/lib/ide/default-modifiers');
+const { defaultValidators, defaultModifiers } = require('@dbetka/wdk/lib/ide/defaults');
 
 initIntellijSettings([
   {
     name: 'EsLint',
-    defaultXMLPath: '../wdk/share/ide/init-intellij-settings/default/eslint.xml',
+    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/eslint.xml',
     targetXMLPath: './.idea/inspectionProfiles/Project_Default.xml',
     replaveIfExists: true,
   },
   {
     name: 'ESLint on save',
-    defaultXMLPath: './ide-default/default-eslint.xml',
+    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/eslint.xml',
     targetXMLPath: './.idea/jsLinters/eslint.xml',
     validator: json => json.project !== undefined
       && json.project.component !== undefined
@@ -55,7 +54,7 @@ initIntellijSettings([
   },
   {
     name: 'Webpack',
-    defaultXMLPath: './ide-default/default-misc.xml',
+    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/webpack.xml',
     targetXMLPath: './.idea/misc.xml',
     replaceIfInvalid: true,
     validator: defaultValidators.webpack(),

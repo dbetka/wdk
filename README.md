@@ -17,5 +17,6 @@ Webpack utils
 IDE utils
 --------------
 
+* [Defaults](docs/defaults.md)
 * [Init Intellij Settings](docs/init-intellij-settings.md)
 * [Export Intellij Settings](docs/export-intellij-settings.md)

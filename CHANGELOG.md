@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] – 2022-10-16
+### Changed
+- Change place of default files, validators and modifiers for ide scripts dbetka A minute ago
+- Update docs
+
 ## [0.5.2] – 2022-09-23
 ### Fixed
 - Correct CHANGELOG file
