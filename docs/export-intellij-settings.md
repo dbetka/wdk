@@ -31,17 +31,17 @@ const {
   exportWebpack,
   exportESLint,
   exportESLintOnSave,
-} = require('../../wdk/lib/ide/export-intellij-settings');
+} = require('@dbetka/wdk/lib/ide/export-intellij-settings');
 
 // specific config file
 exportSpecific({
   src: './.idea/codeStyles/Project.xml',
-  dest: './idea-default/code-styles/scheme.xml',
+  dest: './idea-default/code-styles-scheme.xml',
 })
 
 // defined methods to copy popular files
-exportCodeStyleScheme('./idea-default/code-styles/scheme.xml')    // src: ./.idea/codeStyles/Project.xml
-exportCodeStyleConfig('./idea-default/code-styles/config.xml')    // src: ./.idea/codeStyles/codeStyleConfig.xml
+exportCodeStyleScheme('./idea-default/code-styles-scheme.xml')    // src: ./.idea/codeStyles/Project.xml
+exportCodeStyleConfig('./idea-default/code-styles-config.xml')    // src: ./.idea/codeStyles/codeStyleConfig.xml
 exportWebpack('./idea-default/webpack.xml')                       // src: ./.idea/misc.xml
 exportESLint('./idea-default/eslint.xml')                         // src: ./.idea/inspectionProfiles/Project_Default.xml
 exportESLintOnSave('./idea-default/eslint-on-save.xml')           // src: ./.idea/jsLinters/eslint.xml
