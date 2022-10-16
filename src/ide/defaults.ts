@@ -89,7 +89,7 @@ export const defaultConfigs = (modifications:ConfigsModifications) => [
   },
   {
     name: 'ESLint on save',
-    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/init-intellij-settings/default/eslint-on-save.xml',
+    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/eslint-on-save.xml',
     targetXMLPath: './.idea/jsLinters/eslint.xml',
     validator: defaultValidators.eslintOnSave(),
     modifier: defaultModifiers.eslintOnSave({ enabled: 'true' }),
@@ -97,7 +97,7 @@ export const defaultConfigs = (modifications:ConfigsModifications) => [
   },
   {
     name: 'Webpack',
-    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/init-intellij-settings/default/misc.xml',
+    defaultXMLPath: './node_modules/@dbetka/wdk/share/ide/webpack.xml',
     targetXMLPath: './.idea/misc.xml',
     validator: defaultValidators.webpack(),
     modifier: defaultModifiers.webpack({ dir: modifications.webpackPath }),
