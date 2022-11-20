@@ -43,7 +43,7 @@ export function progressBarPlugin (): ProgressBarPluginType {
     return {
       plugin: undefined,
       stop: () => undefined,
-      start: () => undefined,
+      start: () => console.log('  in progress...'),
     };
   }
 

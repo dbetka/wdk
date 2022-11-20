@@ -2,9 +2,9 @@ import * as chalk from 'chalk';
 import * as dayjs from 'dayjs';
 import { Table } from 'console-table-printer';
 import { progressBarPlugin } from './progress-bar';
-import type {ProgressBarPluginType} from './progress-bar';
+import type { ProgressBarPluginType } from './progress-bar';
 import * as duration from 'dayjs/plugin/duration';
-import type { Compiler, WebpackOptionsNormalized, Stats } from 'webpack';
+import type { Compiler, WebpackOptionsNormalized, Stats, WebpackPluginInstance } from 'webpack';
 
 dayjs.extend(duration);
 
@@ -16,7 +16,7 @@ declare interface AppConsoleFramePluginConfigType {
   onBuildDone?: [
     {
       name: string
-      method(): Promise<string|undefined>
+      method(): Promise<string | undefined>
       output?: boolean
     }
   ];
@@ -26,10 +26,9 @@ export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
   const progressBar = progressBarPlugin();
   const mainPlugin = new AppConsoleFramePlugin(config, progressBar);
 
-  return [
-    mainPlugin,
-    progressBar.plugin,
-  ];
+  const plugins:WebpackPluginInstance[] = [mainPlugin];
+  progressBar.plugin && plugins.push(progressBar.plugin);
+  return plugins;
 }
 
 class AppConsoleFramePlugin {
@@ -59,15 +58,10 @@ class AppConsoleFramePlugin {
       this.progressBar.start();
     };
 
-    if (compiler.options.watch) {
-      compiler.hooks.watchRun.tap(pluginName,
-        makeLogo,
-      );
-    } else {
-      compiler.hooks.beforeRun.tap(pluginName,
-        makeLogo,
-      );
-    }
+    if (compiler.options.watch)
+      compiler.hooks.watchRun.tap(pluginName, makeLogo);
+    else
+      compiler.hooks.beforeRun.tap(pluginName, makeLogo);
 
     compiler.hooks.done.tapAsync(pluginName,
       (stats: Stats, callback) => {
@@ -90,13 +84,13 @@ class AppConsoleFramePlugin {
             this.write(chalk.green.bold(`  Build completed in ${time}s`));
             this.newLine(2);
 
-              this.runAdditionalActivities()
-                .then(() => {
-                  if (compiler.options.watch) {
-                    this.newLine();
-                    this.write('  Waiting for changes...');
-                  }
-                });
+            this.runAdditionalActivities()
+              .then(() => {
+                if (compiler.options.watch) {
+                  this.newLine();
+                  this.write('  Waiting for changes...');
+                }
+              });
           });
         }, 200);
       },
