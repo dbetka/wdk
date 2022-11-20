@@ -1,6 +1,6 @@
 {
   "name": "@dbetka/wdk",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Web Development Kit for dbetka projects",
   "license": "MIT",
   "bin": {
