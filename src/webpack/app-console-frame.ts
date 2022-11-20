@@ -74,7 +74,7 @@ class AppConsoleFramePlugin {
         callback();
 
         setTimeout(() => {
-          process.stdout.cursorTo(0, 6, () => {
+          this.cursorTo(0, 6, () => {
             const time = Math.abs(dayjs(stats.startTime).diff(stats.endTime, 'second', true));
 
             this.writeAssetsSizes(stats);
@@ -177,15 +177,15 @@ class AppConsoleFramePlugin {
   }
 
   clearLine () {
-    process.stdout.clearLine(0);
+    process.stdout.clearLine && process.stdout.clearLine(0);
   }
 
   clearRight () {
-    process.stdout.clearLine(1);
+    process.stdout.clearLine && process.stdout.clearLine(1);
   }
 
   clearDown () {
-    process.stdout.clearScreenDown();
+    process.stdout.clearScreenDown && process.stdout.clearScreenDown();
   }
 
   newLine (numberOfNewLines = 1) {
@@ -200,6 +200,15 @@ class AppConsoleFramePlugin {
     this.clearRight();
     this.clearDown();
     process.stdout.write(text);
+  }
+
+  cursorTo (x: number, y?: number, callback?: () => void) {
+    if (process.stdout.cursorTo)
+      process.stdout.cursorTo(x, y, callback);
+    else if (callback) {
+      this.newLine();
+      callback();
+    }
   }
 
   tableConfig () {
