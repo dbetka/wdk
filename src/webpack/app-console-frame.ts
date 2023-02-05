@@ -8,18 +8,21 @@ import type { Compiler, WebpackOptionsNormalized, Stats, WebpackPluginInstance }
 
 dayjs.extend(duration);
 
+declare type AdditionalActivities = undefined | [
+  {
+    name: string
+    method(): Promise<string | undefined>
+    output?: boolean
+  }
+];
+
 declare interface AppConsoleFramePluginConfigType {
   appName: string;
   isClientApp?: boolean;
   appVersion: string;
   target: string;
-  onBuildDone?: [
-    {
-      name: string
-      method(): Promise<string | undefined>
-      output?: boolean
-    }
-  ];
+  onBuildBefore?: AdditionalActivities;
+  onBuildDone?: AdditionalActivities;
 }
 
 export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
@@ -55,13 +58,20 @@ class AppConsoleFramePlugin {
       this.newLine();
       this.write(`  ${mode} - ${targetText} - ${watch}`);
       this.newLine(2);
+    };
+
+    const init = async (compilerStats: Compiler, callback: () => void) => {
+      makeLogo();
+      await this.runAdditionalActivities(this.config.onBuildBefore);
+      this.newLine();
       this.progressBar.start();
+      callback();
     };
 
     if (compiler.options.watch)
-      compiler.hooks.watchRun.tap(pluginName, makeLogo);
+      compiler.hooks.watchRun.tapAsync(pluginName, init);
     else
-      compiler.hooks.beforeRun.tap(pluginName, makeLogo);
+      compiler.hooks.beforeRun.tapAsync(pluginName, init);
 
     compiler.hooks.done.tapAsync(pluginName,
       (stats: Stats, callback) => {
@@ -84,7 +94,7 @@ class AppConsoleFramePlugin {
             this.write(chalk.green.bold(`  Build completed in ${time}s`));
             this.newLine(2);
 
-            this.runAdditionalActivities()
+            this.runAdditionalActivities(this.config.onBuildDone)
               .then(() => {
                 if (compiler.options.watch) {
                   this.newLine();
@@ -97,15 +107,14 @@ class AppConsoleFramePlugin {
     );
   }
 
-  async runAdditionalActivities () {
-    const onBuildDone = this.config.onBuildDone;
-    const onBuildDoneDefined = onBuildDone && onBuildDone?.length > 0;
+  async runAdditionalActivities (activitiesList:AdditionalActivities) {
+    const activitiesDefined = activitiesList && activitiesList?.length > 0;
 
-    if (onBuildDoneDefined) {
+    if (activitiesDefined) {
       this.write(chalk.bold(`  Additional activities:`));
       this.newLine();
 
-      for (const activity of onBuildDone) {
+      for (const activity of activitiesList) {
         try {
           this.write(`  - ${activity.name}`);
           const activityOutput = await activity.method();
