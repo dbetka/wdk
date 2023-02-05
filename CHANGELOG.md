@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] – 2023-02-05
+### Added
+- AppConsoleFrame: Add possible to run scripts before start building.
+
 ## [0.6.1] – 2022-10-16
 ### Fixed
 - Fix paths for eslint and webpack files
