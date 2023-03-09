@@ -22,7 +22,7 @@ export declare interface ProgressBarPluginType {
   start(): void;
 }
 
-export function progressBarPlugin (): ProgressBarPluginType {
+export function progressBarPlugin (webpackExternal: typeof webpack, config: { linesBeforeBar: number } = { linesBeforeBar: 0 }): ProgressBarPluginType {
   const options: ProgressBarPluginOptionsType = {
     format: `  Build ${chalk.bgGray(':bar')} ${chalk.green.bold(':percent')} `,
     renderThrottle: 100,
@@ -39,11 +39,23 @@ export function progressBarPlugin (): ProgressBarPluginType {
   const stream = options.stream || process.stderr;
   const enabled = stream && stream.isTTY;
 
+  const progressBarPosition = [0, 4 + config.linesBeforeBar] as const;
+
   if (!enabled) {
+    let displayEmergencyProgress = false;
+    const emergencyPlugin = new webpackExternal.ProgressPlugin((percent) => {
+      if (displayEmergencyProgress) {
+        stream.cursorTo(...progressBarPosition);
+        stream.clearLine && stream.clearLine(0);
+        stream.write('  Build  ' + chalk.green.bold(`${Math.round(percent * 100)}% `));
+        stream.cursorTo(...progressBarPosition);
+      }
+    });
+
     return {
-      plugin: undefined,
-      stop: () => undefined,
-      start: () => console.log('  in progress...'),
+      plugin: emergencyPlugin,
+      stop: () => (displayEmergencyProgress = false),
+      start: () => (displayEmergencyProgress = true),
     };
   }
 
@@ -76,7 +88,7 @@ export function progressBarPlugin (): ProgressBarPluginType {
   let startTime = 0;
   let lastPercent = 0;
 
-  const plugin = new webpack.ProgressPlugin((percent, msg) => {
+  const plugin = new webpackExternal.ProgressPlugin((percent, msg) => {
     if (stopDisplaying) {
       return;
     }
@@ -91,13 +103,13 @@ export function progressBarPlugin (): ProgressBarPluginType {
       lastPercent = percent;
     }
 
-    if (percent === 1) {
-      stream.cursorTo(0, 4);
-    }
+    stream.cursorTo(...progressBarPosition);
 
     bar.update(percent, {
       msg,
     });
+
+    stream.cursorTo(...progressBarPosition);
 
     if (!running) {
       running = true;

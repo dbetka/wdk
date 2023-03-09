@@ -5,6 +5,8 @@ import { progressBarPlugin } from './progress-bar';
 import type { ProgressBarPluginType } from './progress-bar';
 import * as duration from 'dayjs/plugin/duration';
 import type { Compiler, WebpackOptionsNormalized, Stats, WebpackPluginInstance } from 'webpack';
+import * as webpack from 'webpack';
+import { Dayjs } from "dayjs";
 
 dayjs.extend(duration);
 
@@ -25,8 +27,10 @@ declare interface AppConsoleFramePluginConfigType {
   onBuildDone?: AdditionalActivities;
 }
 
-export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
-  const progressBar = progressBarPlugin();
+const getLinesDown = (list?: AdditionalActivities) => list?.length ? list?.length + 2 : 0;
+
+export function appConsoleFramePlugin(webpackExternal: typeof webpack, config: AppConsoleFramePluginConfigType) {
+  const progressBar = progressBarPlugin(webpackExternal, { linesBeforeBar: getLinesDown(config.onBuildBefore) });
   const mainPlugin = new AppConsoleFramePlugin(config, progressBar);
 
   const plugins:WebpackPluginInstance[] = [mainPlugin];
@@ -37,6 +41,7 @@ export function appConsoleFramePlugin(config: AppConsoleFramePluginConfigType) {
 class AppConsoleFramePlugin {
   config: AppConsoleFramePluginConfigType;
   progressBar: ProgressBarPluginType;
+  startTime: null | Dayjs = null;
 
   constructor (config: AppConsoleFramePluginConfigType, progressBar: ProgressBarPluginType) {
     this.config = config;
@@ -61,8 +66,9 @@ class AppConsoleFramePlugin {
     };
 
     const init = async (compilerStats: Compiler, callback: () => void) => {
+      this.startTime = dayjs();
       makeLogo();
-      await this.runAdditionalActivities(this.config.onBuildBefore);
+      await this.runAdditionalActivities(this.config.onBuildBefore, 'Before');
       this.newLine();
       this.progressBar.start();
       callback();
@@ -84,41 +90,41 @@ class AppConsoleFramePlugin {
         callback();
 
         setTimeout(() => {
-          this.cursorTo(0, 6, () => {
-            const time = Math.abs(dayjs(stats.startTime).diff(stats.endTime, 'second', true));
+          this.cursorTo(0, 6 + getLinesDown(this.config.onBuildBefore), async () => {
 
+            await this.runAdditionalActivities(this.config.onBuildDone, 'After');
+            this.newLine();
+
+            const time = Math.abs(dayjs(this.startTime).diff(dayjs(), 'second', true));
             this.writeAssetsSizes(stats);
             this.newLine();
             this.write(chalk.green('  Done at ' + chalk.bold(dayjs().format('HH:mm:ss'))));
             this.newLine();
             this.write(chalk.green.bold(`  Build completed in ${time}s`));
-            this.newLine(2);
+            this.newLine();
 
-            this.runAdditionalActivities(this.config.onBuildDone)
-              .then(() => {
-                if (compiler.options.watch) {
-                  this.newLine();
-                  this.write('  Waiting for changes...');
-                }
-              });
+            if (compiler.options.watch) {
+              this.newLine();
+              this.write('  Waiting for changes...');
+            }
           });
         }, 200);
       },
     );
   }
 
-  async runAdditionalActivities (activitiesList:AdditionalActivities) {
+  async runAdditionalActivities (activitiesList:AdditionalActivities, label:string = 'Additional') {
     const activitiesDefined = activitiesList && activitiesList?.length > 0;
 
     if (activitiesDefined) {
-      this.write(chalk.bold(`  Additional activities:`));
+      this.write(`  ${label} activities:`);
       this.newLine();
 
       for (const activity of activitiesList) {
         try {
-          this.write(`  - ${activity.name}`);
+          this.write(chalk.dim(`  - ${activity.name} `));
           const activityOutput = await activity.method();
-          this.write(chalk.green.bold(`    Done!`));
+          this.write(chalk.green(`   Done!`));
           this.newLine();
           if (activity.output && activityOutput) this.write(activityOutput);
 
@@ -167,7 +173,7 @@ class AppConsoleFramePlugin {
 
         const firstAssetNamePart = assetName.split('.')[0];
         const secondAssetNamePart = assetName.split('.').splice(1).join('.');
-        const styledAssetName = chalk.reset.bold(firstAssetNamePart) + chalk.gray('.' + secondAssetNamePart);
+        const styledAssetName = chalk.reset.bold(firstAssetNamePart) + chalk.dim('.' + secondAssetNamePart);
 
         const isOverSizeLimit = asset.size() > maxAssetSize;
         const writeWithColor = chalk.bold[isOverSizeLimit && isProductionMode ? 'yellow' : 'green'];
