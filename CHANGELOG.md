@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] – 2023-10-22
+### Fixed
+- AppConsoleFrame: Fix progress bar code for azure build
+
 ## [0.7.0] – 2023-02-05
 ### Added
 - AppConsoleFrame: Add possible to run scripts before start building.

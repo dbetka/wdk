@@ -37,6 +37,7 @@ export function progressBarPlugin (webpackExternal: typeof webpack, config: { li
   };
 
   const stream = options.stream || process.stderr;
+  if (!stream.cursorTo) stream.cursorTo = ():boolean => true;
   const enabled = stream && stream.isTTY;
 
   const progressBarPosition = [0, 4 + config.linesBeforeBar] as const;
