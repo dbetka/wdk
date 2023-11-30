@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk from "chalk";
 
 export const shell = {
   write: (text:string) => process.stdout.write(text),

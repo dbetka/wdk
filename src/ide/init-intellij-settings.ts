@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';

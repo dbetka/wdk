@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { shell } from '../helpers/shell';
 
 const libName = 'export-intellij-settings';
