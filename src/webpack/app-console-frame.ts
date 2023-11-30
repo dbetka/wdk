@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import * as dayjs from 'dayjs';
 import { Table } from 'console-table-printer';
 import { progressBarPlugin } from './progress-bar';

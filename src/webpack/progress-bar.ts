@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import * as ProgressBar from 'progress';
 import * as webpack from 'webpack';
 
