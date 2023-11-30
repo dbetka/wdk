@@ -1,6 +1,6 @@
 {
   "name": "@dbetka/wdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Web Development Kit for dbetka projects",
   "license": "MIT",
   "type": "module",
