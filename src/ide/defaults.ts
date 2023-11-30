@@ -1,4 +1,4 @@
-import { getByName, modifyAttr, modifyValueByName } from './xml-utils';
+import { getByName, modifyAttr, modifyValueByName } from './xml-utils.js';
 
 export const defaultValidators = {
   projectDefaultEslint: () => (json:any) => {

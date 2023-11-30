@@ -1,4 +1,4 @@
-import { checkIfStringIsReadable} from './random';
+import { checkIfStringIsReadable} from './random.js';
 
 export class ValidateTools {
   static hasNumber (data: string): boolean {

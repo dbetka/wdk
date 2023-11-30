@@ -1,4 +1,4 @@
-import { Communicates, CommunicatesHandlers } from './models/communicates';
+import { Communicates, CommunicatesHandlers } from './models/communicates.js';
 
 export const communicatesFactory = ({ open, openTemporary }: CommunicatesHandlers): Communicates =>
   ({

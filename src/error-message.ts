@@ -1,5 +1,5 @@
-import { Communicates } from './models/communicates';
-import { ErrorMessageConfig } from './models/errors';
+import { Communicates } from './models/communicates.js';
+import { ErrorMessageConfig } from './models/errors.js';
 
 export class ErrorMessage extends Error {
   public humanMessage = '';

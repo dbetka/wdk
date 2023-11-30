@@ -1,4 +1,4 @@
-import { generateRandomStringWithoutSimilarChars } from './random';
+import { generateRandomStringWithoutSimilarChars } from './random.js';
 
 interface IdUtilsConfig {
   idLength: number;

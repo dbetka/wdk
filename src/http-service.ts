@@ -4,7 +4,7 @@ import {
   HttpQueryConfig,
   HttpServiceConfig,
   SuccessFunction,
-} from './models/http';
+} from './models/http.js';
 
 export class HttpService<ErrorOptions, ServerError> {
   private config? : HttpServiceConfig<ErrorOptions, ServerError>;

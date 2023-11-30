@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
-import { shell as defaultShell } from '../helpers/shell';
+import { shell as defaultShell } from '../helpers/shell.js';
 
 const shell = {
   ...defaultShell,
